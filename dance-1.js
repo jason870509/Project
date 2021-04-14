@@ -24,7 +24,9 @@ var pose1 = {
     rightFeetX: 0.01,
     leftFeetX: 0.01,
     rightHandY: 1.4,
-    leftHandY: -1.4
+    leftHandY: -1.4,
+    rightHandX: 0.1,
+    leftHandX: 0.1
 }
 var pose2 = {
     bodyY: 147.04657070279424,
@@ -52,7 +54,9 @@ var pose2 = {
     rightFeetX: 0.01,
     leftFeetX: 0.7066892464013543,
     rightHandY: 1.4,
-    leftHandY: -1.5043183742591024
+    leftHandY: -1.5043183742591024,
+    rightHandX: 0.1,
+    leftHandX: 0.1
 }
 var pose3 = {
     bodyY: 112.90601185436071,
@@ -80,7 +84,9 @@ var pose3 = {
     rightFeetX: 0.01,
     leftFeetX: 0.01,
     rightHandY: 1.4,
-    leftHandY: -1.4
+    leftHandY: -1.4,
+    rightHandX: 0.1,
+    leftHandX: 0.1
 }
 
 var pose4 = {
@@ -109,7 +115,9 @@ var pose4 = {
     rightFeetX: -0.3337849280270957,
     leftFeetX: 0.01,
     rightHandY: 1.4,
-    leftHandY: -1.4
+    leftHandY: -1.4,
+    rightHandX: 0.1,
+    leftHandX: 0.1
 }
 
 var pose5 = {
@@ -138,11 +146,13 @@ var pose5 = {
     rightFeetX: 0.7066892464013543,
     leftFeetX: 0.01,
     rightHandY: 1.4,
-    leftHandY: -1.5043183742591024
+    leftHandY: -1.5043183742591024,
+    rightHandX: 0.1,
+    leftHandX: 0.1
 }
 
 var T = 3;
-var keys = [
+var dance1Keys = [
     [0, pose1],
     [0.1, pose2],
     [0.3, pose3],
@@ -233,7 +243,9 @@ function loadJSON() {
                     "rightFeetX": 0.01,
                     "leftFeetX": 0.01,
                     "rightHandY": 1.4,
-                    "leftHandY": -1.4
+                    "leftHandY": -1.4,
+                    "rightHandX": 0.1,
+                    "leftHandX": 0.1
                 }
             },
             "pose4": {
@@ -260,7 +272,9 @@ function loadJSON() {
                     "rightFeetX": -0.3337849280270957,
                     "leftFeetX": 0.01,
                     "rightHandY": 1.4,
-                    "leftHandY": -1.4
+                    "leftHandY": -1.4,
+                    "rightHandX": 0.1,
+                    "leftHandX": 0.1
                 }
             },
             "pose5": {
@@ -287,12 +301,14 @@ function loadJSON() {
                     "rightFeetX": 0.7066892464013543,
                     "leftFeetX": 0.01,
                     "rightHandY": 1.4,
-                    "leftHandY": -1.5043183742591024
+                    "leftHandY": -1.5043183742591024,
+                    "rightHandX": 0.1,
+                    "leftHandX": 0.1
                 }
             },
 
         },
-        "preset": "pose2",
+        "preset": "",
         "closed": false,
         "folders": {}
     }

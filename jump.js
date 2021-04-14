@@ -91,7 +91,7 @@ var pose3 = {
     leftHandX: 0.1
 }
 var T = 3;
-var keys = [
+var jumpKeys = [
     [0, pose2],
     [0.3, pose3],
     [0.5, pose1],
@@ -180,7 +180,7 @@ function loadJSON() {
                 }
             }
         },
-        "preset": "pose1",
+        "preset": "",
         "closed": false,
         "folders": {}
     }

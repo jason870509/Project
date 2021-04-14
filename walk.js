@@ -92,7 +92,7 @@ var pose3 = {
 }
 
 var T = 3;
-var keys = [
+var walkKeys = [
     [0, pose2],
     [0.1, pose1],
     [0.2, pose1],

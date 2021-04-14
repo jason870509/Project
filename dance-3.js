@@ -184,7 +184,7 @@ var pose6 = {
     leftHandX: 0.1
 }
 var T = 3;
-var keys = [
+var dance3Keys = [
     [0, pose1],
     [0.05, pose1],
     [0.2, pose5],
@@ -392,7 +392,7 @@ function loadJSON() {
                 }
             }
         },
-        "preset": "pose5",
+        "preset": "",
         "closed": false,
         "folders": {}
     }
