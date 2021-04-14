@@ -1,0 +1,185 @@
+var pose1 = {
+    bodyY: 128,
+    bodyZ: 0.1,
+    bodyRX: 0.001,
+    bodyRY: 0.001,
+    bodyRZ: 0.001,
+    upperBodyX: 0.36528365791701933,
+    rightUpperArmX: 0.9505503810330227,
+    rightUpperArmZ: 0.18789161727349724,
+    rightLowerArmX: -1.208433530906012,
+    rightLowerArmZ: 0.01,
+    leftUpperArmX: -1.7806943268416595,
+    leftUpperArmZ: -0.028873835732430297,
+    leftLowerArmX: -1.3027265029635902,
+    leftLowerArmZ: -0.5968331922099916,
+    rightUpperLegX: -1.9270110076206604,
+    rightUpperLegZ: 0.01,
+    rightLowerLegX: 1.6401185436071126,
+    rightLowerLegZ: 0.01,
+    leftUpperLegX: 0.01,
+    leftUpperLegZ: 0.01,
+    leftLowerLegX: -0.1,
+    leftLowerLegZ: 0.01,
+    rightFeetX: 0.9068077900084675,
+    leftFeetX: 0.1,
+    rightHandY: 0.1,
+    leftHandY: 0.1,
+    rightHandX: 0.1,
+    leftHandX: 0.1
+}
+
+var pose2 = {
+    bodyY: 128,
+    bodyZ: 0.1,
+    bodyRX: 0.001,
+    bodyRY: 0.001,
+    bodyRZ: 0.001,
+    upperBodyX: 0.1,
+    rightUpperArmX: 0.01,
+    rightUpperArmZ: 0.01,
+    rightLowerArmX: 0.1,
+    rightLowerArmZ: 0.01,
+    leftUpperArmX: 0.01,
+    leftUpperArmZ: 0.01,
+    leftLowerArmX: 0.1,
+    leftLowerArmZ: 0.01,
+    rightUpperLegX: 0.01,
+    rightUpperLegZ: 0.01,
+    rightLowerLegX: -0.1,
+    rightLowerLegZ: 0.01,
+    leftUpperLegX: 0.01,
+    leftUpperLegZ: 0.01,
+    leftLowerLegX: -0.1,
+    leftLowerLegZ: 0.01,
+    rightFeetX: 0.1,
+    leftFeetX: 0.1,
+    rightHandY: 0.1,
+    leftHandY: 0.1,
+    rightHandX: 0.1,
+    leftHandX: 0.1
+}
+
+var pose3 = {
+    bodyY: 128,
+    bodyZ: 0.1,
+    bodyRX: 0.001,
+    bodyRY: 0.001,
+    bodyRZ: 0.001,
+    upperBodyX: 0.36528365791701933,
+    rightUpperArmX: -1.7806943268416595,
+    rightUpperArmZ: -0.028873835732430297,
+    rightLowerArmX: -1.3027265029635902,
+    rightLowerArmZ: 0.5968331922099916,
+    leftUpperArmX: 0.9505503810330227,
+    leftUpperArmZ: 0.18789161727349724,
+    leftLowerArmX: -1.208433530906012,
+    leftLowerArmZ: 0.01,
+    rightUpperLegX: -0.024894157493648983,
+    rightUpperLegZ: 0.01,
+    rightLowerLegX: 0.1,
+    rightLowerLegZ: 0.01,
+    leftUpperLegX: -1.9270110076206604,
+    leftUpperLegZ: 0.01447925486875512,
+    leftLowerLegX: 1.6401185436071126,
+    leftLowerLegZ: 0.01,
+    rightFeetX: 0.1,
+    leftFeetX: 0.9068077900084675,
+    rightHandY: 0.1,
+    leftHandY: 0.1,
+    rightHandX: 0.1,
+    leftHandX: 0.1
+}
+
+var T = 3;
+var keys = [
+    [0, pose2],
+    [0.1, pose1],
+    [0.2, pose1],
+    [0.5, pose2],
+    [0.6, pose3],
+    [0.7, pose3],
+    [1, pose2]
+];
+
+function loadJSON() {
+    return {
+        "remembered": {
+            "pose1": {
+                "0": {
+                    "bodyY": 128,
+                    "upperBodyX": 0.36528365791701933,
+                    "rightUpperArmX": 0.9505503810330227,
+                    "rightUpperArmZ": 0.18789161727349724,
+                    "rightLowerArmX": -1.208433530906012,
+                    "rightLowerArmZ": 0.01,
+                    "leftUpperArmX": -1.7806943268416595,
+                    "leftUpperArmZ": -0.028873835732430297,
+                    "leftLowerArmX": -1.3027265029635902,
+                    "leftLowerArmZ": -0.5968331922099916,
+                    "rightUpperLegX": -1.9270110076206604,
+                    "rightUpperLegZ": 0.01,
+                    "rightLowerLegX": 1.6401185436071126,
+                    "rightLowerLegZ": 0.01,
+                    "leftUpperLegX": 0.01,
+                    "leftUpperLegZ": 0.01,
+                    "leftLowerLegX": 0.1,
+                    "leftLowerLegZ": 0.01,
+                    "rightFeetX": 0.9068077900084675,
+                    "leftFeetX": 0.1
+                }
+            },
+            "pose2": {
+                "0": {
+                    "bodyY": 128,
+                    "upperBodyX": 0.1,
+                    "rightUpperArmX": 0.01,
+                    "rightUpperArmZ": 0.01,
+                    "rightLowerArmX": 0.1,
+                    "rightLowerArmZ": 0.01,
+                    "leftUpperArmX": 0.01,
+                    "leftUpperArmZ": 0.01,
+                    "leftLowerArmX": 0.1,
+                    "leftLowerArmZ": 0.01,
+                    "rightUpperLegX": 0.01,
+                    "rightUpperLegZ": 0.01,
+                    "rightLowerLegX": -0.1,
+                    "rightLowerLegZ": 0.01,
+                    "leftUpperLegX": 0.01,
+                    "leftUpperLegZ": 0.01,
+                    "leftLowerLegX": -0.1,
+                    "leftLowerLegZ": 0.01,
+                    "rightFeetX": 0.1,
+                    "leftFeetX": 0.1
+                }
+            },
+            "pose3": {
+                "0": {
+                    "bodyY": 128,
+                    "upperBodyX": 0.36528365791701933,
+                    "rightUpperArmX": -1.7806943268416595,
+                    "rightUpperArmZ": -0.028873835732430297,
+                    "rightLowerArmX": -1.3027265029635902,
+                    "rightLowerArmZ": 0.5968331922099916,
+                    "leftUpperArmX": 0.9505503810330227,
+                    "leftUpperArmZ": 0.18789161727349724,
+                    "leftLowerArmX": -1.208433530906012,
+                    "leftLowerArmZ": 0.01,
+                    "rightUpperLegX": -0.024894157493648983,
+                    "rightUpperLegZ": 0.01,
+                    "rightLowerLegX": 0.1,
+                    "rightLowerLegZ": 0.01,
+                    "leftUpperLegX": -1.9270110076206604,
+                    "leftUpperLegZ": 0.01447925486875512,
+                    "leftLowerLegX": 1.6401185436071126,
+                    "leftLowerLegZ": 0.01,
+                    "rightFeetX": 0.1,
+                    "leftFeetX": 0.9068077900084675
+                }
+            }
+        },
+        "preset": "pose2",
+        "closed": false,
+        "folders": {}
+    }
+}
