@@ -178,7 +178,7 @@ function loadJSON() {
                 }
             }
         },
-        "preset": "pose2",
+        "preset": "",
         "closed": false,
         "folders": {}
     }

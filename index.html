@@ -30,7 +30,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="buildModel.js"></script>
-  <script src="dance-3.js"></script>
+  <script src="walk.js"></script>
 
   <script>
 
@@ -55,6 +55,13 @@
 
     $('#play').click(function () {
       isPaused = !isPaused;
+
+      if (isPaused) {
+        $('#play').text('Dance');
+      }
+      else {
+        $('#play').text('GUI');
+      }
     });
 
     init();
