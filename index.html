@@ -24,27 +24,28 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="walkKeys">Please select dance</option>
+      <option value="dance4Keys">Please select dance</option>
       <option value="walkKeys">walk(default)</option>
       <option value="jumpKeys">jump</option>
       <option value="dance1Keys">dance-1</option>
       <option value="dance3Keys">dance-2</option>
+      <option value="dance4Keys">dance-3</option>
     </select>
   </div>
-  <script src="https://threejs.org/build/three.js"></script>
-  <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="./js/Three.js"></script>
+  <script src="./js/OrbitControls.js"></script>
+  <script src="./js/dat.gui.min.js"></script>
+  <script src="./js/KeyboardState.js"></script>
+  <script src="./js/jquery-2.1.4.min.js"></script>
   <script src="buildModel.js"></script>
   <script src="walk.js"></script>
   <script src="jump.js"></script>
   <script src="dance-1.js"></script>
   <script src="dance-3.js"></script>
-
+  <script src="dance-4.js"></script>
   <script>
 
-    var guiNameString = ['bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ', 'upperBodyX', 'rightUpperArmX',
+    var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ', 'upperBodyX', 'rightUpperArmX',
       'rightUpperArmZ', 'rightLowerArmX', 'rightLowerArmZ', 'leftUpperArmX', 'leftUpperArmZ', 'leftLowerArmX',
       'leftLowerArmZ', 'rightUpperLegX', 'rightUpperLegZ', 'rightLowerLegX', 'rightLowerLegZ', 'leftUpperLegX',
       'leftUpperLegZ', 'leftLowerLegX', 'leftLowerLegZ', 'rightFeetX', 'leftFeetX', 'rightHandY', 'leftHandY',
@@ -53,7 +54,7 @@
     var clock = new THREE.Clock();
     var ts = clock.getElapsedTime();
     var intKey = [];
-    var isPaused = true;
+    var isPaused = false;
     var dacne = 1;
 
     var scene, renderer, camera, controls;
@@ -153,6 +154,7 @@
 
       gcontrol = {
         // Body
+        bodyX: 0.01,
         bodyY: 128.1,
         bodyZ: 0.1,
         bodyRX: 0.001,
@@ -197,6 +199,7 @@
       gui.domElement.id = 'gui';
       gui.remember(gcontrol);
       // Body
+      gui.add(gcontrol, 'bodyX', -100, 100);
       gui.add(gcontrol, 'bodyY', -10, 200);
       gui.add(gcontrol, 'bodyZ', -100, 100);
       gui.add(gcontrol, 'bodyRX', -3, 3);
@@ -260,44 +263,46 @@
         keyframe(clock.getElapsedTime());
 
         // Body
-        body.position.y = intKey[0];
-        body.position.z = intKey[1];
+        body.position.x = intKey[0];
+        body.position.y = intKey[1];
+        body.position.z = intKey[2];
         body.eulerOrder = 'XZY';
-        body.rotation.x = intKey[2];
-        body.rotation.y = intKey[3];
-        body.rotation.z = intKey[4];
-        upperBodyGroup.rotation.x = intKey[5];
+        body.rotation.x = intKey[3];
+        body.rotation.y = intKey[4];
+        body.rotation.z = intKey[5];
+        upperBodyGroup.rotation.x = intKey[6];
         // Right Arm
-        rightUpperArmGroup.rotation.x = intKey[6];
-        rightUpperArmGroup.rotation.z = intKey[7];
-        rightLowerArmGroup.rotation.x = intKey[8];
-        rightLowerArmGroup.rotation.z = intKey[9];
+        rightUpperArmGroup.rotation.x = intKey[7];
+        rightUpperArmGroup.rotation.z = intKey[8];
+        rightLowerArmGroup.rotation.x = intKey[9];
+        rightLowerArmGroup.rotation.z = intKey[10];
         // Left Arm
-        leftUpperArmGroup.rotation.x = intKey[10];
-        leftUpperArmGroup.rotation.z = intKey[11];
-        leftLowerArmGroup.rotation.x = intKey[12];
-        leftLowerArmGroup.rotation.z = intKey[13];
+        leftUpperArmGroup.rotation.x = intKey[11];
+        leftUpperArmGroup.rotation.z = intKey[12];
+        leftLowerArmGroup.rotation.x = intKey[13];
+        leftLowerArmGroup.rotation.z = intKey[14];
         // Right Leg
-        rightUpperLegGroup.rotation.x = intKey[14];
-        rightUpperLegGroup.rotation.z = intKey[15];
-        rightLowerLegGroup.rotation.x = intKey[16];
-        rightLowerLegGroup.rotation.z = intKey[17];
+        rightUpperLegGroup.rotation.x = intKey[15];
+        rightUpperLegGroup.rotation.z = intKey[16];
+        rightLowerLegGroup.rotation.x = intKey[17];
+        rightLowerLegGroup.rotation.z = intKey[18];
         // Left Leg
-        leftUpperLegGroup.rotation.x = intKey[18];
-        leftUpperLegGroup.rotation.z = intKey[19];
-        leftLowerLegGroup.rotation.x = intKey[20];
-        leftLowerLegGroup.rotation.z = intKey[21];
+        leftUpperLegGroup.rotation.x = intKey[19];
+        leftUpperLegGroup.rotation.z = intKey[20];
+        leftLowerLegGroup.rotation.x = intKey[21];
+        leftLowerLegGroup.rotation.z = intKey[22];
         // Feet
-        rightFeetGroup.rotation.x = intKey[22];
-        leftFeetGroup.rotation.x = intKey[23];
+        rightFeetGroup.rotation.x = intKey[23];
+        leftFeetGroup.rotation.x = intKey[24];
         // Hand
-        rightHandGroup.rotation.y = intKey[24];
-        leftHandGroup.rotation.y = intKey[25];
-        rightHandGroup.rotation.x = intKey[26];
-        leftHandGroup.rotation.x = intKey[27];
+        rightHandGroup.rotation.y = intKey[25];
+        leftHandGroup.rotation.y = intKey[26];
+        rightHandGroup.rotation.x = intKey[27];
+        leftHandGroup.rotation.x = intKey[28];
       }
       else {
         body.eulerOrder = 'XZY';
+        body.position.x = gcontrol.bodyX;
         body.position.y = gcontrol.bodyY;
         body.position.z = gcontrol.bodyZ;
         body.rotation.x = gcontrol.bodyRX;
