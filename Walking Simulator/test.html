@@ -31,16 +31,12 @@
   <script>
 
     const L2 = 52, L1 = 48, Ls = 53, Lh = 33, Hh = 95, Hr = 6.0, Fc = 15.0;
-    var legTheta = Math.PI * 0.3;
-    var x1 = 0, x2 = 53 * Math.cos(legTheta), y1 = 0, y2 = 0, z1 = 0, z2 = -53 * Math.sin(legTheta);
-    var axes = [];
-    var joints = new THREE.Vector3();
 
-
+    var bodyLink, bodyLink2;
     var camera, scene, renderer;
     var clock = new THREE.Clock();
     var dt = 0;
-
+    var axes = [];
     // 測試用
     var mouse = new THREE.Vector2();
     var target = new THREE.Vector3();
@@ -52,6 +48,18 @@
         this.theta1 = 0;
         this.theta2 = 0;
         this.target = new THREE.Vector3();
+
+        this.legTheta = Math.PI * 0.3;
+
+        this.x1 = 0;
+        this.x2 = 53 * Math.cos(this.legTheta);
+        this.y1 = 0;
+        this.y2 = 0;
+        this.z1 = 0;
+        this.z2 = -53 * Math.sin(this.legTheta);
+
+
+        this.joints = new THREE.Vector3();
       }
 
       init() {
@@ -193,7 +201,7 @@
       var body = bodyLink.init();
       scene.add(body);
       bodyLink2 = new LinkLeg();
-      body.rotation.y = legTheta;
+      body.rotation.y = bodyLink.legTheta;
       var body2 = bodyLink2.init();
       scene.add(body2);
       bodyLink.body.add(bodyLink2.body);
@@ -231,9 +239,9 @@
       floor.receiveShadow = true;
 
       /////////////////////////////////////////////////////////
-      // ik_ccd init
-      for (var i = 0; i < 3; i++)
-        joints[i] = new THREE.Vector3();
+      // // ik_ccd init
+      // for (var i = 0; i < 3; i++)
+      //   joints[i] = new THREE.Vector3();
       setarm();
 
       /////////////////////////////////////////////////////////
@@ -299,21 +307,21 @@
       var tt = dt % Ts;
 
       var moveX = Ls / 2 + Ls * dt / Ts; // 原始x軸移動量
-      var torsoTarget = new THREE.Vector3(moveX * Math.cos(legTheta), Hh - Hr / 2 * Math.cos(2 * Math.PI * dt / Ts), (-moveX) * Math.sin(legTheta));
+      var torsoTarget = new THREE.Vector3(moveX * Math.cos(bodyLink.legTheta), Hh - Hr / 2 * Math.cos(2 * Math.PI * dt / Ts), (-moveX) * Math.sin(bodyLink.legTheta));
       bodyLink.body.position.copy(torsoTarget);
       // bodyLink2.upperLegGroup.position.copy(torsoTarget);
       var legMoveX = 2 * Ls * time / Ts; // 原始x軸移動量
       if (n % 2 === 0) {
-        x1 += legMoveX * Math.cos(legTheta);
-        y1 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts))
-        z1 -= legMoveX * Math.sin(legTheta);
+        bodyLink.x1 += legMoveX * Math.cos(bodyLink.legTheta);
+        bodyLink.y1 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts))
+        bodyLink.z1 -= legMoveX * Math.sin(bodyLink.legTheta);
       } else {
-        x2 += legMoveX * Math.cos(legTheta);
-        y2 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts));
-        z2 -= legMoveX * Math.sin(legTheta);
+        bodyLink2.x2 += legMoveX * Math.cos(bodyLink.legTheta);
+        bodyLink2.y2 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts));
+        bodyLink2.z2 -= legMoveX * Math.sin(bodyLink.legTheta);
       }
 
-      var walkTarget1 = new THREE.Vector3(x1, y1, z1);
+      var walkTarget1 = new THREE.Vector3(bodyLink.x1, bodyLink.y1, bodyLink.z1);
       bodyLink.body.worldToLocal(walkTarget1);
       thetas = [bodyLink.theta1, bodyLink.theta2];
       bodyLink.target.copy(walkTarget1);
@@ -321,7 +329,7 @@
       bodyLink.update(thetas);
 
 
-      var walkTarget2 = new THREE.Vector3(x2, y2, z2);
+      var walkTarget2 = new THREE.Vector3(bodyLink2.x2, bodyLink2.y2, bodyLink2.z2);
       bodyLink2.body.worldToLocal(walkTarget2);
       thetas = [bodyLink2.theta1, bodyLink2.theta2];
       bodyLink2.target.copy(walkTarget2);

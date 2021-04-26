@@ -3,6 +3,7 @@ function buildUpperTorso() {
     waist = new THREE.Mesh(new THREE.SphereGeometry(8, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
     upperTorso = new THREE.Mesh(new THREE.CylinderGeometry(30, 10, 30, 5), new THREE.MeshPhongMaterial({ color: 0xff88ff }));
     upperTorso.position.set(0, 20, 0);
+
     waist.add(upperTorso);
     Group.add(waist);
     return Group;
@@ -49,20 +50,20 @@ function buildLeg() {
     upperLegGroup = new THREE.Object3D();
 
     var upperLegJoint = new THREE.Mesh(new THREE.SphereGeometry(7, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
-    var upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 40, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    var upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 52, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
     upperLeg.position.y = -20;
 
     lowerLegGroup = new THREE.Object3D();
     lowerLegGroup.position.set(0, -40, 0);
 
     var knee = new THREE.Mesh(new THREE.SphereGeometry(6, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
-    var lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 40, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    var lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 48, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
     lowerLeg.position.y = -20;
 
     feetGroup = new THREE.Object3D();
     feetGroup.position.set(0, -43, 0);
     feetJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
-    feet = new THREE.Mesh(new THREE.BoxGeometry(10, 7, 30), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    feet = new THREE.Mesh(new THREE.BoxGeometry(10, 7, 30), new THREE.MeshPhongMaterial({ color: 0xff0000 }));
     feet.position.set(0, -5, 10);
 
     feetGroup.add(feetJoint, feet);
@@ -71,6 +72,52 @@ function buildLeg() {
 
     return [upperLegGroup, lowerLegGroup, feetGroup];
 }
+
+// class LinkLeg {
+//     constructor() {
+//         this.theta1 = 0;
+//         this.theta2 = 0;
+//         this.target = new THREE.Vector3();
+//     }
+
+//     init() {
+//         // Left Leg
+//         this.body = new THREE.Object3D();
+//         this.upperLegGroup = new THREE.Object3D();
+
+//         this.upperLegJoint = new THREE.Mesh(new THREE.SphereGeometry(7, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+//         this.upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 52, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+//         this.upperLeg.position.y = -26;
+
+//         this.lowerLegGroup = new THREE.Object3D();
+//         this.lowerLegGroup.position.set(0, -52, 0);
+
+//         this.knee = new THREE.Mesh(new THREE.SphereGeometry(6, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+//         this.lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 48, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+//         this.lowerLeg.position.y = -24;
+
+//         this.feetGroup = new THREE.Object3D();
+//         this.feetGroup.position.set(0, -45, 0);
+//         this.feetJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+//         this.feet = new THREE.Mesh(new THREE.BoxGeometry(30, 7, 10), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+//         this.feet.position.set(10, -5, 0);
+//         // this.feet.rotation.y = -Math.PI / 2;
+//         this.feetGroup.add(this.feetJoint, this.feet);
+
+//         this.upperLegGroup.add(this.upperLegJoint, this.upperLeg, this.lowerLegGroup);
+//         this.lowerLegGroup.add(this.knee, this.lowerLeg, this.feetGroup);
+
+//         this.body.add(this.upperLegGroup);
+
+//         return this.body;
+//     }
+//     update(thetas) {
+//         this.theta1 = thetas[0]
+//         this.theta2 = thetas[1]
+//         this.upperLegGroup.rotation.z = this.theta1
+//         this.lowerLegGroup.rotation.z = this.theta2
+//     }
+// }
 
 function buildHead() {
     headGroup = new THREE.Object3D();

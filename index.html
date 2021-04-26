@@ -37,12 +37,15 @@
   <script src="./js/dat.gui.min.js"></script>
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
+  <audio id="soundtrack" autoplay loop style="display:none">
+    <source src="sounds/rock_you.mp3" type='audio/wav'>
+  </audio>
   <script src="buildModel.js"></script>
-  <script src="walk.js"></script>
-  <script src="jump.js"></script>
-  <script src="dance-1.js"></script>
-  <script src="dance-3.js"></script>
-  <script src="dance-4.js"></script>
+  <script src="./dance/walk.js"></script>
+  <script src="./dance/jump.js"></script>
+  <script src="./dance/dance-1.js"></script>
+  <script src="./dance/dance-3.js"></script>
+  <script src="./dance/dance-4.js"></script>
   <script>
 
     var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ', 'upperBodyX', 'rightUpperArmX',
@@ -57,6 +60,10 @@
     var isPaused = false;
     var dacne = 1;
 
+    var soundTrack;
+    var isPaused = false;
+    var isDimming = false, soundVal = 1.0, sign = 1.0;
+
     var scene, renderer, camera, controls;
     var gcontrol;
     var body, torso;
@@ -64,14 +71,19 @@
     var leftUpperLegGroup, leftLowerLegGroup, rightUpperLegGroup, rightLowerLegGroup;
     var lefttHandGroup, rightHandGroup, leftFeetGroup, rightFeetGroup;
 
+    clock.stop();
 
     $('#play').click(function () {
       isPaused = !isPaused;
 
       if (isPaused) {
+        clock.start();
+        soundTrack.play();
         $('#play').text('Dance');
       }
       else {
+        clock.stop();
+        soundTrack.pause();
         $('#play').text('GUI');
       }
     });
@@ -81,6 +93,9 @@
     animate();
 
     function init() {
+      soundTrack = document.getElementById('soundtrack');
+      soundTrack.pause();
+
       scene = new THREE.Scene();
 
       camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
@@ -238,6 +253,7 @@
     }
 
     function keyframe(t) {
+
       var keys = eval(document.getElementById("dance").value);
       var s = ((t - ts) % T) / T;
 
@@ -260,10 +276,14 @@
 
 
       if (isPaused) {
+        soundVal += sign * 0.01;
+        soundVal = THREE.Math.clamp(soundVal, 0, 1);
+        soundtrack.volume = soundVal;
+
         keyframe(clock.getElapsedTime());
 
         // Body
-        body.position.x = intKey[0];
+        body.position.x = intKey[0] + 20;
         body.position.y = intKey[1];
         body.position.z = intKey[2];
         body.eulerOrder = 'XZY';
@@ -332,7 +352,6 @@
         rightHandGroup.rotation.x = gcontrol.rightHandX;
         leftHandGroup.rotation.x = gcontrol.leftHandX;
       }
-
 
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
