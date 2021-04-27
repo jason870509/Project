@@ -127,6 +127,9 @@ function buildHead() {
 
     head = new THREE.Mesh(new THREE.CylinderGeometry(10, 5, 20, 80), new THREE.MeshPhongMaterial({ color: 0xff00ff }))
     head.position.set(0, 10, 0);
+    face = new THREE.Mesh(new THREE.BoxGeometry(18, 8, 5), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    face.position.set(0, 5, 10);
+    head.add(face);
     headGroup.add(headJoint, head);
 
     return headGroup;

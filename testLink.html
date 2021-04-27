@@ -24,13 +24,14 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="walk2">Please select dance</option>
-      <option value="walk">walk(default)</option>
+      <option value="dance4">Please select dance</option>
+      <option value="walk">walk</option>
       <option value="walk2">walk-2</option>
       <option value="jump">jump</option>
       <option value="dance1">dance-1</option>
       <option value="dance3">dance-2</option>
       <option value="dance4">dance-3</option>
+      <option value="dance5">dance-4</option>
     </select>
   </div>
   <script src="./js/three.js"></script>
@@ -38,9 +39,13 @@
   <script src="./js/dat.gui.min.js"></script>
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
-  <audio id="soundtrack" autoplay loop style="display:none">
+  <audio id="soundtrack2" autoplay loop style="display:none">
     <source src="sounds/rock_you.mp3" type='audio/wav'>
   </audio>
+  <audio id="soundtrack" autoplay loop style="display:none">
+    <source src="sounds/rap_beat.mp3" type='audio/wav'>
+  </audio>
+
   <script src="buildModel.js"></script>
   <script src="./dance/walk.js"></script>
   <script src="./dance/jump.js"></script>
@@ -48,10 +53,13 @@
   <script src="./dance/dance-3.js"></script>
   <script src="./dance/dance-4.js"></script>
   <script src="./dance/walk2.js"></script>
+  <script src="./dance/dance-5.js"></script>
   <script src="./Walking Simulator/js/ccdbox.js"></script>
   <script>
 
-    var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ', 'upperBodyX',
+    var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ',
+      'upperBodyX', 'upperBodyY', 'upperBodyZ',
+      'lowerBodyX', 'lowerBodyY', 'lowerBodyZ',
       'rightUpperArmX', 'rightUpperArmY', 'rightUpperArmZ', 'rightLowerArmX',
       'leftUpperArmX', 'leftUpperArmY', 'leftUpperArmZ', 'leftLowerArmX',
       'rightUpperLegX', 'rightUpperLegY', 'rightUpperLegZ', 'rightLowerLegX',
@@ -68,8 +76,9 @@
     var intKey = [];
     var change = 0;
     var dacne = 1;
+    var changePosition = false;
 
-    var soundTrack;
+    var soundTrack, soundTrack2;
     var isPaused = false;
     var isDimming = false, soundVal = 1.0, sign = 1.0;
 
@@ -85,9 +94,9 @@
     $('#play').click(function () {
       change += 1;
       first = 1;
-      if (change == 2) change = 0;
+      if (change == 3) change = 1;
 
-      if (change == 1) {
+      if (change == 1) { // Dance
         for (i = 0; i < moveModel.length; i++) {
           moveModel[i].body.visible = false;
         }
@@ -99,7 +108,7 @@
         soundTrack.play();
         $('#play').text('Dance');
       }
-      else if (change == 0) {
+      else if (change == 2) { // Move
         for (i = 0; i < model.length; i++) {
           model[i].body.visible = false;
         }
@@ -109,16 +118,19 @@
             danceClock.start();
         }
         moveClock.start();
-
-
-        soundTrack.pause();
-        $('#play').text('GUI');
-      }
-      else {
-        danceClock.stop();
         soundTrack.pause();
         $('#play').text('Move');
-        model[0].body.visible = true;
+      }
+      else if (change == 3) { // GUI
+        for (i = 0; i < model.length; i++) {
+          model[i].body.visible = true;
+        }
+        for (i = 0; i < moveModel.length; i++) {
+          moveModel[i].body.visible = false;
+        }
+        danceClock.stop();
+        soundTrack.pause();
+        $('#play').text('GUI');
       }
     });
 
@@ -213,7 +225,7 @@
       reset() {
         this.dt = 0;
         this.preTorsoTarget = this.torsoTarget;
-        console.log(this.torsoTarget)
+        //console.log(this.torsoTarget)
         this.x1 = this.preTorsoTarget.x;
         this.x2 = 53 * Math.cos(this.legTheta) + this.preTorsoTarget.x;
         this.z1 = this.preTorsoTarget.z;
@@ -273,7 +285,7 @@
       init() {
         this.body = new THREE.Object3D();
         scene.add(this.body);
-        this.body.visible = false;
+
 
         this.upperBodyGroup = buildUpperTorso();
         this.lowerBodyGroup = buildLowerTorso();
@@ -363,6 +375,8 @@
     function init() {
       soundTrack = document.getElementById('soundtrack');
       soundTrack.pause();
+      soundTrack2 = document.getElementById('soundtrack2');
+      soundTrack2.pause();
 
       scene = new THREE.Scene();
 
@@ -395,8 +409,10 @@
       for (i = 0; i < 3; i++) {
         model[i] = new DanceModel();
         body = model[i].init();
+        // model[i].body.visible = false;
       }
 
+      // model[0].body.position.set(0, 128, 0);
       model[0].body.position.set(-150, 128, 0);
       model[1].body.position.set(150, 128, 0);
       model[2].body.position.set(0, 128, 0);
@@ -406,10 +422,12 @@
         moveModel[i] = new MoveModel();
         body = moveModel[i].init();
         scene.add(body);
+        moveModel[i].body.visible = false
         moveModel[i + 1] = new MoveModel();
         body = moveModel[i + 1].init();
         moveModel[i].body.add(moveModel[i + 1].body);
         moveModel[i + 1].body.position.z = 30;
+        moveModel[i + 1].body.visible = false
         moveModel[i + 1].upperBodyGroup.visible = false
         moveModel[i + 1].lowerBodyGroup.visible = false
       }
@@ -421,56 +439,58 @@
       moveModel[4].legTheta = Math.PI * 3 / 2;
       moveModel[4].isMove = false;
 
-      //gcontrol
-
-      gcontrol = {
-        // Body
-        // bodyX: 0.01,
-        // bodyY: 128.1,
-        // bodyZ: 0.1,
-        // bodyRX: 0.001,
-        // bodyRY: 0.001,
-        // bodyRZ: 0.001,
-        // upperBodyX: 0.1,
-        // // Right Arm
-        // rightUpperArmX: 0.01,
-        // rightUpperArmY: 0.01,
-        // rightUpperArmZ: 0.01,
-        // rightLowerArmX: 0.01,
-        // // Left Arm
-        // leftUpperArmX: 0.01,
-        // leftUpperArmY: 0.01,
-        // leftUpperArmZ: 0.01,
-        // leftLowerArmX: 0.01,
-        // // Right Leg
-        // rightUpperLegX: 0.01,
-        // rightUpperLegY: 0.01,
-        // rightUpperLegZ: 0.01,
-        // rightLowerLegX: 0.01,
-        // rightLowerLegY: 0.01,
-        // rightLowerLegZ: 0.01,
-        // // Left Leg
-        // leftUpperLegX: 0.01,
-        // leftUpperLegY: 0.01,
-        // leftUpperLegZ: 0.01,
-        // leftLowerLegX: 0.01,
-        // leftLowerLegY: 0.01,
-        // leftLowerLegZ: 0.01,
-        // // Feet
-        // rightFeetX: 0.01,
-        // rightFeetZ: 0.01,
-        // leftFeetX: 0.01,
-        // leftFeetZ: 0.01,
-        // // Hand
-        // rightHandX: 0.1,
-        // rightHandZ: 0.1,
-        // leftHandX: 0.1,
-        // leftHandZ: 0.1,
-        // // Head
-        // headX: 0.001,
-        // headY: 0.001,
-        // headZ: 0.001,
-      };
+      //dance gcontrol
+      // gcontrol = {
+      //   // Body
+      //   bodyX: 0.01,
+      //   bodyY: 128.1,
+      //   bodyZ: 0.1,
+      //   bodyRX: 0.001,
+      //   bodyRY: 0.001,
+      //   bodyRZ: 0.001,
+      //   // Upper Body
+      //   upperBodyX: 0.01,
+      //   upperBodyY: 0.01,
+      //   upperBodyZ: 0.01,
+      //   // Lower Body
+      //   lowerBodyX: 0.01,
+      //   lowerBodyY: 0.01,
+      //   lowerBodyZ: 0.01,
+      //   // Right Arm
+      //   rightUpperArmX: 0.01,
+      //   rightUpperArmY: 0.01,
+      //   rightUpperArmZ: 0.01,
+      //   rightLowerArmX: 0.01,
+      //   // Left Arm
+      //   leftUpperArmX: 0.01,
+      //   leftUpperArmY: 0.01,
+      //   leftUpperArmZ: 0.01,
+      //   leftLowerArmX: 0.01,
+      //   // Right Leg
+      //   rightUpperLegX: 0.01,
+      //   rightUpperLegY: 0.01,
+      //   rightUpperLegZ: 0.01,
+      //   rightLowerLegX: 0.01,
+      //   // Left Leg
+      //   leftUpperLegX: 0.01,
+      //   leftUpperLegY: 0.01,
+      //   leftUpperLegZ: 0.01,
+      //   leftLowerLegX: 0.01,
+      //   // Feet
+      //   rightFeetX: 0.01,
+      //   rightFeetZ: 0.01,
+      //   leftFeetX: 0.01,
+      //   leftFeetZ: 0.01,
+      //   // Hand
+      //   rightHandX: 0.1,
+      //   rightHandZ: 0.1,
+      //   leftHandX: 0.1,
+      //   leftHandZ: 0.1,
+      //   // Head
+      //   headX: 0.001,
+      //   headY: 0.001,
+      //   headZ: 0.001,
+      // };
 
       // var gui = new dat.GUI({
       //   load: loadJSON(),
@@ -479,14 +499,21 @@
 
       // gui.domElement.id = 'gui';
       // gui.remember(gcontrol);
-      // Body
+      // // Body
       // gui.add(gcontrol, 'bodyX', -100, 100);
       // gui.add(gcontrol, 'bodyY', -10, 200);
       // gui.add(gcontrol, 'bodyZ', -100, 100);
       // gui.add(gcontrol, 'bodyRX', -3, 3);
       // gui.add(gcontrol, 'bodyRY', -3, 3);
       // gui.add(gcontrol, 'bodyRZ', -3, 3);
-      // gui.add(gcontrol, 'upperBodyX', -3, 1.5);
+      // // Upper Body
+      // gui.add(gcontrol, 'upperBodyX', -3, 3);
+      // gui.add(gcontrol, 'upperBodyY', -3, 3);
+      // gui.add(gcontrol, 'upperBodyZ', -3, 3);
+      // // Lower Body
+      // gui.add(gcontrol, 'lowerBodyX', -3, 3);
+      // gui.add(gcontrol, 'lowerBodyY', -3, 3);
+      // gui.add(gcontrol, 'lowerBodyZ', -3, 3);
       // // Right Arm
       // gui.add(gcontrol, 'rightUpperArmX', -6, 6);
       // gui.add(gcontrol, 'rightUpperArmY', -6, 6);
@@ -502,15 +529,11 @@
       // gui.add(gcontrol, 'rightUpperLegY', -6, 1);
       // gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
       // gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
-      // gui.add(gcontrol, 'rightLowerLegY', -1, 1);
-      // gui.add(gcontrol, 'rightLowerLegZ', -0.5, 1.7);
       // // Left Leg
       // gui.add(gcontrol, 'leftUpperLegX', -3, 1.5);
       // gui.add(gcontrol, 'leftUpperLegY', -1, 1);
       // gui.add(gcontrol, 'leftUpperLegZ', -2.5, 1.5);
       // gui.add(gcontrol, 'leftLowerLegX', 0.1, 3);
-      // gui.add(gcontrol, 'leftLowerLegY', -1, 1);
-      // gui.add(gcontrol, 'leftLowerLegZ', -0.5, 1.7);
       // // Feet
       // gui.add(gcontrol, 'rightFeetX', -3, 3);
       // gui.add(gcontrol, 'rightFeetZ', -3, 3);
@@ -527,22 +550,44 @@
       // gui.add(gcontrol, 'headZ', -6, 6);
 
 
+
+      // move gcontrol
+      gcontrol = {
+        leftModelTheta: Math.PI * 2 / 3,
+        rightModelTheta: Math.PI / 3
+      };
+      var gui = new dat.GUI({
+        load: loadJSON(),
+        //preset: "run"
+      });
+
+      gui.domElement.id = 'gui';
+      gui.remember(gcontrol);
+      gui.add(gcontrol, 'leftModelTheta', -6.12, 6.12);
+      gui.add(gcontrol, 'rightModelTheta', -6.12, 6.12);
+
+
       setarm();
     }
 
     function keyframe(type, t) {
       var keys = eval(document.getElementById("dance").value + "Keys");
-      if (type == 0) {
-        keys = walk2Keys;
-      }
-      else if (type == 1) {
-        keys = dance3Keys;
-      }
-      else if (type == 2) {
-        keys = dance4Keys;
-      }
-
       var T = eval(document.getElementById("dance").value + "T");
+
+      // if (type == 0) {
+      //   keys = walk2Keys;
+      //   T = walk2T;
+      // }
+      // else if (type == 1) {
+      //   keys = dance3Keys;
+      //   T = dance3T;
+      // }
+      // else if (type == 2) {
+      //   keys = dance4Keys;
+      //   T = dance4T;
+      // }
+
+
       var s = ((t - ts) % T) / T;
 
       for (var i = 1; i < keys.length; i++) {
@@ -552,7 +597,7 @@
       var ii = i - 1;
       var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
       var forwordKey = 'keys[ii][1].', backwardKey = 'keys[ii + 1][1].';
-      console.log(danceClock.getElapsedTime(), moveClock.getElapsedTime())
+      //console.log(danceClock.getElapsedTime(), moveClock.getElapsedTime())
       for (j = 0; j < guiNameString.length; j++) {
         intKey[j] = eval(forwordKey + guiNameString[j]) * (1 - a) + eval(backwardKey + guiNameString[j]) * a;
       }
@@ -576,53 +621,57 @@
 
       // Body position
       model[i].body.position.x = intKey[0] + moveModel[i * 2].torsoTarget.x;
-      model[i].body.position.y = intKey[1] //+ moveModel[0].torsoTarget.y;
+      model[i].body.position.y = intKey[1];
       model[i].body.position.z = intKey[2] + moveModel[i * 2].torsoTarget.z;
-      if (i == 1 && first == 1) {
-        console.log("position:", model[i].body.position.x, moveModel[i].torsoTarget.x)
-        first = 0;
-      }
+
 
       // Body rotation
       model[i].body.eulerOrder = 'XYZ';
       model[i].body.rotation.x = intKey[3];
       model[i].body.rotation.y = intKey[4];
       model[i].body.rotation.z = intKey[5];
+      // Upper Body
       model[i].upperBodyGroup.rotation.x = intKey[6];
+      model[i].upperBodyGroup.rotation.y = intKey[7];
+      model[i].upperBodyGroup.rotation.z = intKey[8];
+      // Lower Body
+      model[i].lowerBodyGroup.rotation.x = intKey[9];
+      model[i].lowerBodyGroup.rotation.y = intKey[10];
+      model[i].lowerBodyGroup.rotation.z = intKey[11];
       // Right Arm
-      model[i].rightUpperArmGroup.rotation.x = intKey[7];
-      model[i].rightUpperArmGroup.rotation.y = intKey[8];
-      model[i].rightUpperArmGroup.rotation.z = intKey[9];
-      model[i].rightLowerArmGroup.rotation.x = intKey[10];
+      model[i].rightUpperArmGroup.rotation.x = intKey[12];
+      model[i].rightUpperArmGroup.rotation.y = intKey[13];
+      model[i].rightUpperArmGroup.rotation.z = intKey[14];
+      model[i].rightLowerArmGroup.rotation.x = intKey[15];
       // Left Arm
-      model[i].leftUpperArmGroup.rotation.x = intKey[11];
-      model[i].leftUpperArmGroup.rotation.y = intKey[12];
-      model[i].leftUpperArmGroup.rotation.z = intKey[13];
-      model[i].leftLowerArmGroup.rotation.x = intKey[14];
+      model[i].leftUpperArmGroup.rotation.x = intKey[16];
+      model[i].leftUpperArmGroup.rotation.y = intKey[17];
+      model[i].leftUpperArmGroup.rotation.z = intKey[18];
+      model[i].leftLowerArmGroup.rotation.x = intKey[19];
       // Right Leg
-      model[i].rightUpperLegGroup.rotation.x = intKey[15];
-      model[i].rightUpperLegGroup.rotation.y = intKey[16];
-      model[i].rightUpperLegGroup.rotation.z = intKey[17];
-      model[i].rightLowerLegGroup.rotation.x = intKey[18];
+      model[i].rightUpperLegGroup.rotation.x = intKey[20];
+      model[i].rightUpperLegGroup.rotation.y = intKey[21];
+      model[i].rightUpperLegGroup.rotation.z = intKey[22];
+      model[i].rightLowerLegGroup.rotation.x = intKey[23];
       // Left Leg
-      model[i].leftUpperLegGroup.rotation.x = intKey[19];
-      model[i].leftUpperLegGroup.rotation.y = intKey[20];
-      model[i].leftUpperLegGroup.rotation.z = intKey[21];
-      model[i].leftLowerLegGroup.rotation.x = intKey[22];
+      model[i].leftUpperLegGroup.rotation.x = intKey[24];
+      model[i].leftUpperLegGroup.rotation.y = intKey[25];
+      model[i].leftUpperLegGroup.rotation.z = intKey[26];
+      model[i].leftLowerLegGroup.rotation.x = intKey[27];
       // Feet
-      model[i].rightFeetGroup.rotation.x = intKey[23];
-      model[i].rightFeetGroup.rotation.z = intKey[24];
-      model[i].leftFeetGroup.rotation.x = intKey[25];
-      model[i].leftFeetGroup.rotation.z = intKey[26];
+      model[i].rightFeetGroup.rotation.x = intKey[28];
+      model[i].rightFeetGroup.rotation.z = intKey[29];
+      model[i].leftFeetGroup.rotation.x = intKey[30];
+      model[i].leftFeetGroup.rotation.z = intKey[31];
       // Hand
-      model[i].rightHandGroup.rotation.x = intKey[27];
-      model[i].rightHandGroup.rotation.z = intKey[28];
-      model[i].leftHandGroup.rotation.x = intKey[29];
-      model[i].leftHandGroup.rotation.z = intKey[30];
+      model[i].rightHandGroup.rotation.x = intKey[32];
+      model[i].rightHandGroup.rotation.z = intKey[33];
+      model[i].leftHandGroup.rotation.x = intKey[34];
+      model[i].leftHandGroup.rotation.z = intKey[35];
       // Head
-      model[i].headGroup.rotation.x = intKey[31];
-      model[i].headGroup.rotation.y = intKey[32];
-      model[i].headGroup.rotation.z = intKey[33];
+      model[i].headGroup.rotation.x = intKey[36];
+      model[i].headGroup.rotation.y = intKey[37];
+      model[i].headGroup.rotation.z = intKey[38];
     }
 
     function animate() {
@@ -632,14 +681,18 @@
         soundtrack.volume = soundVal;
 
         for (i = 0; i < model.length; i++) {
-          if (i == model.length - 1)
-            keyframeMove(1, i);
+          // if (i == model.length - 1)
+          //   keyframeMove(1, i);
+          // else
+
+          if (changePosition && i == model.length - 1)
+            keyframeMove(4, i);
           else
             keyframeMove(2, i);
         }
 
       }
-      else if (change == 2) {
+      else if (change == 3) {
         var i = 0;
         // Body Position
         model[i].body.position.x = gcontrol.bodyX;
@@ -650,7 +703,14 @@
         model[i].body.rotation.x = gcontrol.bodyRX;
         model[i].body.rotation.y = gcontrol.bodyRY;
         model[i].body.rotation.z = gcontrol.bodyRZ;
+        // Upper Body
         model[i].upperBodyGroup.rotation.x = gcontrol.upperBodyX;
+        model[i].upperBodyGroup.rotation.y = gcontrol.upperBodyY;
+        model[i].upperBodyGroup.rotation.z = gcontrol.upperBodyZ;
+        // Lower Body
+        model[i].lowerBodyGroup.rotation.x = gcontrol.lowerBodyX;
+        model[i].lowerBodyGroup.rotation.y = gcontrol.lowerBodyY;
+        model[i].lowerBodyGroup.rotation.z = gcontrol.lowerBodyZ;
         // Right Arm
         model[i].rightUpperArmGroup.rotation.x = gcontrol.rightUpperArmX;
         model[i].rightUpperArmGroup.rotation.y = gcontrol.rightUpperArmY;
@@ -686,16 +746,20 @@
         model[i].headGroup.rotation.y = gcontrol.headY;
         model[i].headGroup.rotation.z = gcontrol.headZ;
       }
-      else {
+      else if (change == 2) {
         if (first) {
+          moveModel[0].legTheta = gcontrol.leftModelTheta;
+          moveModel[2].legTheta = gcontrol.rightModelTheta;
           for (i = 0; i < moveModel.length; i += 2) {
             moveModel[i].reset();
           }
+          console.log(gcontrol.leftModelTheta)
 
           first = 0;
         }
         else {
           update();
+          changePosition = true;
           // setTimeout(function () {
           //   update();
           // }, 500);
@@ -771,7 +835,6 @@
       // bodyLink.upperLegGroup.rotation.z = theta[0]
       // bodyLink.lowerLegGroup.rotation.z = theta[1]
     }
-
 
   </script>
 </body>
