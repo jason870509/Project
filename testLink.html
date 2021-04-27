@@ -24,7 +24,7 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="dance4">Please select dance</option>
+      <option value="dance5">Please select dance</option>
       <option value="walk">walk</option>
       <option value="walk2">walk-2</option>
       <option value="jump">jump</option>
@@ -574,18 +574,18 @@
       var keys = eval(document.getElementById("dance").value + "Keys");
       var T = eval(document.getElementById("dance").value + "T");
 
-      // if (type == 0) {
-      //   keys = walk2Keys;
-      //   T = walk2T;
-      // }
-      // else if (type == 1) {
-      //   keys = dance3Keys;
-      //   T = dance3T;
-      // }
-      // else if (type == 2) {
-      //   keys = dance4Keys;
-      //   T = dance4T;
-      // }
+      if (type == 0) {
+        keys = walk2Keys;
+        T = walk2T;
+      }
+      else if (type == 1) {
+        keys = dance3Keys;
+        T = dance3T;
+      }
+      else if (type == 2) {
+        keys = dance4Keys;
+        T = dance4T;
+      }
 
 
       var s = ((t - ts) % T) / T;
