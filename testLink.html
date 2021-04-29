@@ -24,7 +24,7 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="dance5">Please select dance</option>
+      <option value="dance6">Please select dance</option>
       <option value="walk">walk</option>
       <option value="walk2">walk-2</option>
       <option value="jump">jump</option>
@@ -32,6 +32,7 @@
       <option value="dance3">dance-2</option>
       <option value="dance4">dance-3</option>
       <option value="dance5">dance-4</option>
+      <option value="dance6">dance-4</option>
     </select>
   </div>
   <script src="./js/three.js"></script>
@@ -54,6 +55,7 @@
   <script src="./dance/dance-4.js"></script>
   <script src="./dance/walk2.js"></script>
   <script src="./dance/dance-5.js"></script>
+  <script src="./dance/dance-6.js"></script>
   <script src="./Walking Simulator/js/ccdbox.js"></script>
   <script>
 
@@ -75,7 +77,7 @@
     var ts = danceClock.getElapsedTime();
     var intKey = [];
     var change = 0;
-    var dacne = 1;
+    var dacne = 3;
     var changePosition = false;
 
     var soundTrack, soundTrack2;
@@ -94,7 +96,7 @@
     $('#play').click(function () {
       change += 1;
       first = 1;
-      if (change == 3) change = 1;
+      if (change == 2) change = 0;
 
       if (change == 1) { // Dance
         for (i = 0; i < moveModel.length; i++) {
@@ -121,7 +123,7 @@
         soundTrack.pause();
         $('#play').text('Move');
       }
-      else if (change == 3) { // GUI
+      else if (change == 0) { // GUI
         for (i = 0; i < model.length; i++) {
           model[i].body.visible = true;
         }
@@ -158,8 +160,10 @@
       init() {
 
         this.body = new THREE.Object3D();
-        this.upperBodyGroup = buildUpperTorso();
+        this.bodyGroup = buildUpperTorso();
+        this.upperBodyGroup = this.bodyGroup[0];
         upperTorso.rotation.y = Math.PI / 2;
+        // this.upperBodyGroup.rotation.y = Math.PI / 2;
         this.lowerBodyGroup = buildLowerTorso();
         this.upperBodyGroup.position.y = 20;
         this.lowerBodyGroup.position.y = 20;
@@ -287,14 +291,17 @@
         scene.add(this.body);
 
 
-        this.upperBodyGroup = buildUpperTorso();
+        this.bodyGroup = buildUpperTorso();
+        this.upperBodyGroup = this.bodyGroup[0];
+        this.leftShoulder = this.bodyGroup[1];
+        this.rightShoulder = this.bodyGroup[2];
         this.lowerBodyGroup = buildLowerTorso();
         this.body.add(this.upperBodyGroup, this.lowerBodyGroup);
 
         // Left Arm
         this.armGroup = buildArm();
         this.leftUpperArmGroup = this.armGroup[0];
-        this.leftUpperArmGroup.position.set(30, 33, 0);
+        this.leftUpperArmGroup.position.set(15, 0, 0);
         this.leftLowerArmGroup = this.armGroup[1];
         this.leftHandGroup = this.armGroup[2];
 
@@ -302,7 +309,7 @@
         // Right Arm
         this.armGroup = buildArm();
         this.rightUpperArmGroup = this.armGroup[0];
-        this.rightUpperArmGroup.position.set(-30, 33, 0);
+        this.rightUpperArmGroup.position.set(-15, 0, 0);
         this.rightLowerArmGroup = this.armGroup[1];
         this.rightHandGroup = this.armGroup[2];
 
@@ -323,8 +330,10 @@
         // Head
         this.headGroup = buildHead();
 
-        this.upperBodyGroup.add(this.headGroup, this.leftUpperArmGroup, this.rightUpperArmGroup);
-        this.lowerBodyGroup.add(this.leftUpperLegGroup, this.rightUpperLegGroup);
+        this.leftShoulder.add(this.leftUpperArmGroup)
+        this.rightShoulder.add(this.rightUpperArmGroup)
+        this.upperBodyGroup.add(this.headGroup);
+        this.lowerBodyGroup.add(this.rightUpperLegGroup, this.leftUpperLegGroup);
 
         return this.body;
       }
@@ -406,156 +415,92 @@
       floor.rotation.x = Math.PI / 2;
       scene.add(floor);
 
-      for (i = 0; i < 3; i++) {
+      for (i = 0; i < 1; i++) {
         model[i] = new DanceModel();
         body = model[i].init();
         // model[i].body.visible = false;
       }
 
-      // model[0].body.position.set(0, 128, 0);
-      model[0].body.position.set(-150, 128, 0);
-      model[1].body.position.set(150, 128, 0);
-      model[2].body.position.set(0, 128, 0);
+      model[0].body.position.set(0, 128, 0);
+      // model[0].body.position.set(-150, 128, 0);
+      // model[1].body.position.set(150, 128, 0);
+      // model[2].body.position.set(0, 128, 0);
 
 
-      for (i = 0; i < 6; i += 2) {
-        moveModel[i] = new MoveModel();
-        body = moveModel[i].init();
-        scene.add(body);
-        moveModel[i].body.visible = false
-        moveModel[i + 1] = new MoveModel();
-        body = moveModel[i + 1].init();
-        moveModel[i].body.add(moveModel[i + 1].body);
-        moveModel[i + 1].body.position.z = 30;
-        moveModel[i + 1].body.visible = false
-        moveModel[i + 1].upperBodyGroup.visible = false
-        moveModel[i + 1].lowerBodyGroup.visible = false
-      }
+      // for (i = 0; i < 6; i += 2) {
+      //   moveModel[i] = new MoveModel();
+      //   body = moveModel[i].init();
+      //   scene.add(body);
+      //   moveModel[i].body.visible = false
+      //   moveModel[i + 1] = new MoveModel();
+      //   body = moveModel[i + 1].init();
+      //   moveModel[i].body.add(moveModel[i + 1].body);
+      //   moveModel[i + 1].body.position.z = 30;
+      //   moveModel[i + 1].body.visible = false
+      //   moveModel[i + 1].upperBodyGroup.visible = false
+      //   moveModel[i + 1].lowerBodyGroup.visible = false
+      // }
 
-      moveModel[0].torsoTarget.set(-150, 0, 0);
-      moveModel[0].legTheta = Math.PI * 2 / 3;
-      moveModel[2].torsoTarget.set(150, 0, 0);
-      moveModel[2].legTheta = Math.PI / 3;
-      moveModel[4].legTheta = Math.PI * 3 / 2;
-      moveModel[4].isMove = false;
+      // moveModel[0].torsoTarget.set(-150, 0, 0);
+      // moveModel[0].legTheta = Math.PI * 2 / 3;
+      // moveModel[2].torsoTarget.set(150, 0, 0);
+      // moveModel[2].legTheta = Math.PI / 3;
+      // moveModel[4].legTheta = Math.PI * 3 / 2;
+      // moveModel[4].isMove = false;
 
       //dance gcontrol
-      // gcontrol = {
-      //   // Body
-      //   bodyX: 0.01,
-      //   bodyY: 128.1,
-      //   bodyZ: 0.1,
-      //   bodyRX: 0.001,
-      //   bodyRY: 0.001,
-      //   bodyRZ: 0.001,
-      //   // Upper Body
-      //   upperBodyX: 0.01,
-      //   upperBodyY: 0.01,
-      //   upperBodyZ: 0.01,
-      //   // Lower Body
-      //   lowerBodyX: 0.01,
-      //   lowerBodyY: 0.01,
-      //   lowerBodyZ: 0.01,
-      //   // Right Arm
-      //   rightUpperArmX: 0.01,
-      //   rightUpperArmY: 0.01,
-      //   rightUpperArmZ: 0.01,
-      //   rightLowerArmX: 0.01,
-      //   // Left Arm
-      //   leftUpperArmX: 0.01,
-      //   leftUpperArmY: 0.01,
-      //   leftUpperArmZ: 0.01,
-      //   leftLowerArmX: 0.01,
-      //   // Right Leg
-      //   rightUpperLegX: 0.01,
-      //   rightUpperLegY: 0.01,
-      //   rightUpperLegZ: 0.01,
-      //   rightLowerLegX: 0.01,
-      //   // Left Leg
-      //   leftUpperLegX: 0.01,
-      //   leftUpperLegY: 0.01,
-      //   leftUpperLegZ: 0.01,
-      //   leftLowerLegX: 0.01,
-      //   // Feet
-      //   rightFeetX: 0.01,
-      //   rightFeetZ: 0.01,
-      //   leftFeetX: 0.01,
-      //   leftFeetZ: 0.01,
-      //   // Hand
-      //   rightHandX: 0.1,
-      //   rightHandZ: 0.1,
-      //   leftHandX: 0.1,
-      //   leftHandZ: 0.1,
-      //   // Head
-      //   headX: 0.001,
-      //   headY: 0.001,
-      //   headZ: 0.001,
-      // };
-
-      // var gui = new dat.GUI({
-      //   load: loadJSON(),
-      //   //preset: "run"
-      // });
-
-      // gui.domElement.id = 'gui';
-      // gui.remember(gcontrol);
-      // // Body
-      // gui.add(gcontrol, 'bodyX', -100, 100);
-      // gui.add(gcontrol, 'bodyY', -10, 200);
-      // gui.add(gcontrol, 'bodyZ', -100, 100);
-      // gui.add(gcontrol, 'bodyRX', -3, 3);
-      // gui.add(gcontrol, 'bodyRY', -3, 3);
-      // gui.add(gcontrol, 'bodyRZ', -3, 3);
-      // // Upper Body
-      // gui.add(gcontrol, 'upperBodyX', -3, 3);
-      // gui.add(gcontrol, 'upperBodyY', -3, 3);
-      // gui.add(gcontrol, 'upperBodyZ', -3, 3);
-      // // Lower Body
-      // gui.add(gcontrol, 'lowerBodyX', -3, 3);
-      // gui.add(gcontrol, 'lowerBodyY', -3, 3);
-      // gui.add(gcontrol, 'lowerBodyZ', -3, 3);
-      // // Right Arm
-      // gui.add(gcontrol, 'rightUpperArmX', -6, 6);
-      // gui.add(gcontrol, 'rightUpperArmY', -6, 6);
-      // gui.add(gcontrol, 'rightUpperArmZ', -6, 6);
-      // gui.add(gcontrol, 'rightLowerArmX', -6, 6);
-      // // Left Arm
-      // gui.add(gcontrol, 'leftUpperArmX', -6, 6);
-      // gui.add(gcontrol, 'leftUpperArmY', -6, 6);
-      // gui.add(gcontrol, 'leftUpperArmZ', -6, 6);
-      // gui.add(gcontrol, 'leftLowerArmX', -6, 6);
-      // // Right Leg
-      // gui.add(gcontrol, 'rightUpperLegX', -6, 1.5);
-      // gui.add(gcontrol, 'rightUpperLegY', -6, 1);
-      // gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
-      // gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
-      // // Left Leg
-      // gui.add(gcontrol, 'leftUpperLegX', -3, 1.5);
-      // gui.add(gcontrol, 'leftUpperLegY', -1, 1);
-      // gui.add(gcontrol, 'leftUpperLegZ', -2.5, 1.5);
-      // gui.add(gcontrol, 'leftLowerLegX', 0.1, 3);
-      // // Feet
-      // gui.add(gcontrol, 'rightFeetX', -3, 3);
-      // gui.add(gcontrol, 'rightFeetZ', -3, 3);
-      // gui.add(gcontrol, 'leftFeetX', -3, 3);
-      // gui.add(gcontrol, 'leftFeetZ', -3, 3);
-      // // Hand
-      // gui.add(gcontrol, 'rightHandX', -3, 3);
-      // gui.add(gcontrol, 'rightHandZ', -3, 3);
-      // gui.add(gcontrol, 'leftHandX', -3, 3);
-      // gui.add(gcontrol, 'leftHandZ', -3, 3);
-      // // Head
-      // gui.add(gcontrol, 'headX', -6, 6);
-      // gui.add(gcontrol, 'headY', -6, 6);
-      // gui.add(gcontrol, 'headZ', -6, 6);
-
-
-
-      // move gcontrol
       gcontrol = {
-        leftModelTheta: Math.PI * 2 / 3,
-        rightModelTheta: Math.PI / 3
+        // Body
+        bodyX: 0.01,
+        bodyY: 128.1,
+        bodyZ: 0.1,
+        bodyRX: 0.001,
+        bodyRY: 0.001,
+        bodyRZ: 0.001,
+        // Upper Body
+        upperBodyX: 0.01,
+        upperBodyY: 0.01,
+        upperBodyZ: 0.01,
+        // Lower Body
+        lowerBodyX: 0.01,
+        lowerBodyY: 0.01,
+        lowerBodyZ: 0.01,
+        // Right Arm
+        rightUpperArmX: 0.01,
+        rightUpperArmY: 0.01,
+        rightUpperArmZ: 0.01,
+        rightLowerArmX: 0.01,
+        // Left Arm
+        leftUpperArmX: 0.01,
+        leftUpperArmY: 0.01,
+        leftUpperArmZ: 0.01,
+        leftLowerArmX: 0.01,
+        // Right Leg
+        rightUpperLegX: 0.01,
+        rightUpperLegY: 0.01,
+        rightUpperLegZ: 0.01,
+        rightLowerLegX: 0.01,
+        // Left Leg
+        leftUpperLegX: 0.01,
+        leftUpperLegY: 0.01,
+        leftUpperLegZ: 0.01,
+        leftLowerLegX: 0.01,
+        // Feet
+        rightFeetX: 0.01,
+        rightFeetZ: 0.01,
+        leftFeetX: 0.01,
+        leftFeetZ: 0.01,
+        // Hand
+        rightHandX: 0.1,
+        rightHandZ: 0.1,
+        leftHandX: 0.1,
+        leftHandZ: 0.1,
+        // Head
+        headX: 0.001,
+        headY: 0.001,
+        headZ: 0.001,
       };
+
       var gui = new dat.GUI({
         load: loadJSON(),
         //preset: "run"
@@ -563,8 +508,72 @@
 
       gui.domElement.id = 'gui';
       gui.remember(gcontrol);
-      gui.add(gcontrol, 'leftModelTheta', -6.12, 6.12);
-      gui.add(gcontrol, 'rightModelTheta', -6.12, 6.12);
+      // Body
+      gui.add(gcontrol, 'bodyX', -100, 100);
+      gui.add(gcontrol, 'bodyY', -10, 200);
+      gui.add(gcontrol, 'bodyZ', -100, 100);
+      gui.add(gcontrol, 'bodyRX', -3, 3);
+      gui.add(gcontrol, 'bodyRY', -3, 3);
+      gui.add(gcontrol, 'bodyRZ', -3, 3);
+      // Upper Body
+      gui.add(gcontrol, 'upperBodyX', -3, 3);
+      gui.add(gcontrol, 'upperBodyY', -3, 3);
+      gui.add(gcontrol, 'upperBodyZ', -3, 3);
+      // Lower Body
+      gui.add(gcontrol, 'lowerBodyX', -3, 3);
+      gui.add(gcontrol, 'lowerBodyY', -3, 3);
+      gui.add(gcontrol, 'lowerBodyZ', -3, 3);
+      // Right Arm
+      gui.add(gcontrol, 'rightUpperArmX', -6, 6);
+      gui.add(gcontrol, 'rightUpperArmY', -6, 6);
+      gui.add(gcontrol, 'rightUpperArmZ', -6, 6);
+      gui.add(gcontrol, 'rightLowerArmX', -6, 6);
+      // Left Arm
+      gui.add(gcontrol, 'leftUpperArmX', -6, 6);
+      gui.add(gcontrol, 'leftUpperArmY', -6, 6);
+      gui.add(gcontrol, 'leftUpperArmZ', -6, 6);
+      gui.add(gcontrol, 'leftLowerArmX', -6, 6);
+      // Right Leg
+      gui.add(gcontrol, 'rightUpperLegX', -6, 1.5);
+      gui.add(gcontrol, 'rightUpperLegY', -6, 1);
+      gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
+      gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
+      // Left Leg
+      gui.add(gcontrol, 'leftUpperLegX', -3, 1.5);
+      gui.add(gcontrol, 'leftUpperLegY', -1, 1);
+      gui.add(gcontrol, 'leftUpperLegZ', -2.5, 1.5);
+      gui.add(gcontrol, 'leftLowerLegX', 0.1, 3);
+      // Feet
+      gui.add(gcontrol, 'rightFeetX', -3, 3);
+      gui.add(gcontrol, 'rightFeetZ', -3, 3);
+      gui.add(gcontrol, 'leftFeetX', -3, 3);
+      gui.add(gcontrol, 'leftFeetZ', -3, 3);
+      // Hand
+      gui.add(gcontrol, 'rightHandX', -3, 3);
+      gui.add(gcontrol, 'rightHandZ', -3, 3);
+      gui.add(gcontrol, 'leftHandX', -3, 3);
+      gui.add(gcontrol, 'leftHandZ', -3, 3);
+      // Head
+      gui.add(gcontrol, 'headX', -6, 6);
+      gui.add(gcontrol, 'headY', -6, 6);
+      gui.add(gcontrol, 'headZ', -6, 6);
+
+
+
+      // move gcontrol
+      // gcontrol = {
+      //   leftModelTheta: Math.PI * 2 / 3,
+      //   rightModelTheta: Math.PI / 3
+      // };
+      // var gui = new dat.GUI({
+      //   load: loadJSON(),
+      //   //preset: "run"
+      // });
+
+      // gui.domElement.id = 'gui';
+      // gui.remember(gcontrol);
+      // gui.add(gcontrol, 'leftModelTheta', -6.12, 6.12);
+      // gui.add(gcontrol, 'rightModelTheta', -6.12, 6.12);
 
 
       setarm();
@@ -574,18 +583,18 @@
       var keys = eval(document.getElementById("dance").value + "Keys");
       var T = eval(document.getElementById("dance").value + "T");
 
-      if (type == 0) {
-        keys = walk2Keys;
-        T = walk2T;
-      }
-      else if (type == 1) {
-        keys = dance3Keys;
-        T = dance3T;
-      }
-      else if (type == 2) {
-        keys = dance4Keys;
-        T = dance4T;
-      }
+      // if (type == 0) {
+      //   keys = walk2Keys;
+      //   T = walk2T;
+      // }
+      // else if (type == 1) {
+      //   keys = dance3Keys;
+      //   T = dance3T;
+      // }
+      // else if (type == 2) {
+      //   keys = dance4Keys;
+      //   T = dance4T;
+      // }
 
 
       var s = ((t - ts) % T) / T;
@@ -605,7 +614,7 @@
     }
 
     function keyframeMove(type, i) {
-      moveModel[i * 2].body.visible = false;
+      // moveModel[i * 2].body.visible = false;
       model[i].body.visible = true;
 
       keyframe(type, danceClock.getElapsedTime());
@@ -620,9 +629,9 @@
       }
 
       // Body position
-      model[i].body.position.x = intKey[0] + moveModel[i * 2].torsoTarget.x;
+      model[i].body.position.x = intKey[0] //+ moveModel[i * 2].torsoTarget.x;
       model[i].body.position.y = intKey[1];
-      model[i].body.position.z = intKey[2] + moveModel[i * 2].torsoTarget.z;
+      model[i].body.position.z = intKey[2] //+ moveModel[i * 2].torsoTarget.z;
 
 
       // Body rotation
@@ -692,8 +701,9 @@
         }
 
       }
-      else if (change == 3) {
+      else if (change == 0) {
         var i = 0;
+        console.log("GUI")
         // Body Position
         model[i].body.position.x = gcontrol.bodyX;
         model[i].body.position.y = gcontrol.bodyY;
@@ -746,7 +756,7 @@
         model[i].headGroup.rotation.y = gcontrol.headY;
         model[i].headGroup.rotation.z = gcontrol.headZ;
       }
-      else if (change == 2) {
+      else if (change == 1) {
         if (first) {
           moveModel[0].legTheta = gcontrol.leftModelTheta;
           moveModel[2].legTheta = gcontrol.rightModelTheta;

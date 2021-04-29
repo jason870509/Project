@@ -24,12 +24,15 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="dance4Keys">Please select dance</option>
-      <option value="walkKeys">walk(default)</option>
-      <option value="jumpKeys">jump</option>
-      <option value="dance1Keys">dance-1</option>
-      <option value="dance3Keys">dance-2</option>
-      <option value="dance4Keys">dance-3</option>
+      <option value="dance5">Please select dance</option>
+      <option value="walk">walk</option>
+      <option value="walk2">walk-2</option>
+      <option value="jump">jump</option>
+      <option value="dance1">dance-1</option>
+      <option value="dance3">dance-2</option>
+      <option value="dance4">dance-3</option>
+      <option value="dance5">dance-4</option>
+      <option value="dance6">dance-5</option>
     </select>
   </div>
   <script src="./js/three.js"></script>
@@ -37,57 +40,350 @@
   <script src="./js/dat.gui.min.js"></script>
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
+
   <audio id="soundtrack" autoplay loop style="display:none">
-    <source src="sounds/rock_you.mp3" type='audio/wav'>
+    <source src="sounds/rap_beat.mp3" type='audio/wav'>
   </audio>
+  <audio id="soundtrack2" autoplay loop style="display:none">
+    <source src="sounds/xphk1-4y51d.mp3" type='audio/wav'>
+  </audio>
+
   <script src="buildModel.js"></script>
   <script src="./dance/walk.js"></script>
   <script src="./dance/jump.js"></script>
   <script src="./dance/dance-1.js"></script>
   <script src="./dance/dance-3.js"></script>
   <script src="./dance/dance-4.js"></script>
+  <script src="./dance/walk2.js"></script>
+  <script src="./dance/dance-5.js"></script>
+  <script src="./dance/dance-6.js"></script>
+  <script src="./Walking Simulator/js/ccdbox.js"></script>
   <script>
 
-    var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ', 'upperBodyX', 'rightUpperArmX',
-      'rightUpperArmZ', 'rightLowerArmX', 'rightLowerArmZ', 'leftUpperArmX', 'leftUpperArmZ', 'leftLowerArmX',
-      'leftLowerArmZ', 'rightUpperLegX', 'rightUpperLegZ', 'rightLowerLegX', 'rightLowerLegZ', 'leftUpperLegX',
-      'leftUpperLegZ', 'leftLowerLegX', 'leftLowerLegZ', 'rightFeetX', 'leftFeetX', 'rightHandY', 'leftHandY',
-      'rightHandX', 'leftHandX']
+    var guiNameString = ['bodyX', 'bodyY', 'bodyZ', 'bodyRX', 'bodyRY', 'bodyRZ',
+      'upperBodyX', 'upperBodyY', 'upperBodyZ',
+      'lowerBodyX', 'lowerBodyY', 'lowerBodyZ',
+      'rightUpperArmX', 'rightUpperArmY', 'rightUpperArmZ', 'rightLowerArmX',
+      'leftUpperArmX', 'leftUpperArmY', 'leftUpperArmZ', 'leftLowerArmX',
+      'rightUpperLegX', 'rightUpperLegY', 'rightUpperLegZ', 'rightLowerLegX',
+      'leftUpperLegX', 'leftUpperLegY', 'leftUpperLegZ', 'leftLowerLegX',
+      'rightFeetX', 'rightFeetZ',
+      'leftFeetX', 'leftFeetZ',
+      'rightHandX', 'rightHandZ',
+      'leftHandX', 'leftHandZ',
+      'headX', 'headY', 'headZ']
 
-    var clock = new THREE.Clock();
-    var ts = clock.getElapsedTime();
+    var moveClock = new THREE.Clock();
+    var danceClock = new THREE.Clock();
+    var ts = danceClock.getElapsedTime();
     var intKey = [];
-    var isPaused = false;
+    var change = 0;
     var dacne = 1;
+    var changePosition = false;
 
-    var soundTrack;
+    var soundTrack, soundTrack2;
     var isPaused = false;
     var isDimming = false, soundVal = 1.0, sign = 1.0;
 
     var scene, renderer, camera, controls;
     var gcontrol;
-    var body, torso;
-    var leftUpperArmGroup, leftLowerArmGroup, rightUpperArmGroup, rightLowerArmGroup;
-    var leftUpperLegGroup, leftLowerLegGroup, rightUpperLegGroup, rightLowerLegGroup;
-    var lefttHandGroup, rightHandGroup, leftFeetGroup, rightFeetGroup;
+    var model = [], moveModel = [];
 
-    clock.stop();
+    const L2 = 52, L1 = 48, Ls = 53, Lh = 33, Hh = 95, Hr = 6.0, Fc = 15.0;
+    var axes = [];
+    var joints = new THREE.Vector3();
+    var first = 1;
 
     $('#play').click(function () {
-      isPaused = !isPaused;
+      change += 1;
+      first = 1;
+      if (change == 3) change = 1;
 
-      if (isPaused) {
-        clock.start();
-        soundTrack.play();
+      if (change == 1) { // Dance
+        for (i = 0; i < moveModel.length; i++) {
+          moveModel[i].body.visible = false;
+        }
+        for (i = 0; i < model.length; i++) {
+          model[i].body.visible = true;
+        }
+
+        danceClock.start();
+
+        if (changePosition)
+          soundTrack.play();
+        else
+          soundTrack2.play();
         $('#play').text('Dance');
       }
-      else {
-        clock.stop();
+      else if (change == 2) { // Move
+        for (i = 0; i < model.length; i++) {
+          model[i].body.visible = false;
+        }
+        for (i = 0; i < moveModel.length; i++) {
+          moveModel[i].body.visible = true;
+          if (moveModel[i].isMove == false)
+            danceClock.start();
+        }
+        moveClock.start();
         soundTrack.pause();
+        soundTrack2.pause();
+        $('#play').text('Move');
+      }
+      else if (change == 3) { // GUI
+        for (i = 0; i < model.length; i++) {
+          model[i].body.visible = true;
+        }
+        for (i = 0; i < moveModel.length; i++) {
+          moveModel[i].body.visible = false;
+        }
+        danceClock.stop();
+        soundTrack.pause();
+        soundTrack2.pause();
         $('#play').text('GUI');
       }
     });
 
+    class MoveModel {
+      constructor() {
+        this.theta1 = 0;
+        this.theta2 = 0;
+        this.target = new THREE.Vector3();
+        this.dt = 0;
+
+        this.legTheta = Math.PI * 1.8;
+
+        this.x1 = 0;
+        this.x2 = 53 * Math.cos(this.legTheta);
+        this.y1 = 0;
+        this.y2 = 0;
+        this.z1 = 0;
+        this.z2 = -53 * Math.sin(this.legTheta);
+
+        this.torsoTarget = new THREE.Vector3(0, 0, 0);
+        this.preTorsoTarget = new THREE.Vector3(0, 0, 0);
+        this.isMove = true;
+      }
+
+      init() {
+
+        this.body = new THREE.Object3D();
+        this.bodyGroup = buildUpperTorso();
+        this.upperBodyGroup = this.bodyGroup[0];
+        upperTorso.rotation.y = Math.PI / 2;
+        // this.upperBodyGroup.rotation.y = Math.PI / 2;
+        this.lowerBodyGroup = buildLowerTorso();
+        this.upperBodyGroup.position.y = 20;
+        this.lowerBodyGroup.position.y = 20;
+        this.body.add(this.upperBodyGroup, this.lowerBodyGroup);
+
+
+        // Left Arm
+        this.armGroup = buildArm();
+        this.leftUpperArmGroup = this.armGroup[0];
+        this.leftUpperArmGroup.position.set(0, 33, -30);
+        this.leftLowerArmGroup = this.armGroup[1];
+        this.leftHandGroup = this.armGroup[2];
+
+
+        // Right Arm
+        this.armGroup = buildArm();
+        this.rightUpperArmGroup = this.armGroup[0];
+        this.rightUpperArmGroup.position.set(0, 33, 30);
+        this.rightLowerArmGroup = this.armGroup[1];
+        this.rightHandGroup = this.armGroup[2];
+
+        this.headGroup = buildHead();
+
+        this.upperBodyGroup.add(this.headGroup, this.leftUpperArmGroup, this.rightUpperArmGroup);
+
+        this.upperLegGroup = new THREE.Object3D();
+
+        this.upperLegJoint = new THREE.Mesh(new THREE.SphereGeometry(7, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 52, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.upperLeg.position.y = -26;
+
+        this.lowerLegGroup = new THREE.Object3D();
+        this.lowerLegGroup.position.set(0, -52, 0);
+
+        this.knee = new THREE.Mesh(new THREE.SphereGeometry(6, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 48, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.lowerLeg.position.y = -24;
+
+        this.feetGroup = new THREE.Object3D();
+        this.feetGroup.position.set(0, -45, 0);
+        this.feetJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.feet = new THREE.Mesh(new THREE.BoxGeometry(30, 7, 10), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.feet.position.set(10, 0, 0);
+        this.feet.rotation.z = 0.1;
+        this.feetGroup.add(this.feetJoint, this.feet);
+        this.upperLegGroup.position.z = -15
+
+        this.upperLegGroup.add(this.upperLegJoint, this.upperLeg, this.lowerLegGroup);
+        this.lowerLegGroup.add(this.knee, this.lowerLeg, this.feetGroup);
+        this.lowerBodyGroup.add(this.upperLegGroup);
+        this.body.add(this.upperLegGroup);
+
+        return this.body;
+      }
+
+      update(thetas) {
+        this.theta1 = thetas[0]
+        this.theta2 = thetas[1]
+        this.upperLegGroup.rotation.z = this.theta1
+        this.lowerLegGroup.rotation.z = this.theta2
+      }
+
+      reset() {
+        this.dt = 0;
+        this.preTorsoTarget = this.torsoTarget;
+        //console.log(this.torsoTarget)
+        this.x1 = this.preTorsoTarget.x;
+        this.x2 = 53 * Math.cos(this.legTheta) + this.preTorsoTarget.x;
+        this.z1 = this.preTorsoTarget.z;
+        this.z2 = -53 * Math.sin(this.legTheta) + this.preTorsoTarget.z;
+        // Body Position
+        this.body.position.y = 100;
+        this.body.position.x = this.preTorsoTarget.x;
+        this.body.position.z = this.preTorsoTarget.z;
+        // Body Rotation
+        this.body.eulerOrder = 'XYZ';
+        this.body.rotation.x = 0.01;
+        this.body.rotation.y = this.legTheta;
+        this.body.rotation.z = 0.01;
+        this.upperBodyGroup.rotation.x = 0.01;;
+        // Right Arm
+        this.rightUpperArmGroup.rotation.x = 0.01;
+        this.rightUpperArmGroup.rotation.y = 0.01;
+        this.rightUpperArmGroup.rotation.z = 0.01;
+        this.rightLowerArmGroup.rotation.x = 0.01;
+        // Left Arm
+        this.leftUpperArmGroup.rotation.x = 0.01;
+        this.leftUpperArmGroup.rotation.y = 0.01;
+        this.leftUpperArmGroup.rotation.z = 0.01;
+        this.leftLowerArmGroup.rotation.x = 0.01;
+        // Right Leg
+        this.upperLegGroup.rotation.x = 0.01;
+        this.upperLegGroup.rotation.y = 0.01;
+        this.upperLegGroup.rotation.z = 0.01;
+        this.lowerLegGroup.rotation.x = 0.01;
+        // Left Leg
+        this.upperLegGroup.rotation.x = 0.01;
+        this.upperLegGroup.rotation.y = 0.01;
+        this.upperLegGroup.rotation.z = 0.01;
+        this.lowerLegGroup.rotation.x = 0.01;
+        // Feet
+        this.feetGroup.rotation.x = 0.01;
+        this.feetGroup.rotation.z = 0.01;
+        this.feetGroup.rotation.x = 0.01;
+        this.feetGroup.rotation.z = 0.01;
+        // Hand
+        this.rightHandGroup.rotation.x = 0.01;
+        this.rightHandGroup.rotation.z = 0.01;
+        this.leftHandGroup.rotation.x = 0.01;
+        this.leftHandGroup.rotation.z = 0.01;
+        // Head
+        this.headGroup.rotation.x = 0.01;
+        this.headGroup.rotation.y = 0.01;
+        this.headGroup.rotation.z = 0.01;
+      }
+    }
+
+    class DanceModel {
+      constructor() {
+
+      }
+
+      init() {
+        this.body = new THREE.Object3D();
+        scene.add(this.body);
+
+
+        this.bodyGroup = buildUpperTorso();
+        this.upperBodyGroup = this.bodyGroup[0];
+        this.leftShoulder = this.bodyGroup[1];
+        this.rightShoulder = this.bodyGroup[2];
+        this.lowerBodyGroup = buildLowerTorso();
+        this.body.add(this.upperBodyGroup, this.lowerBodyGroup);
+
+        // Left Arm
+        this.armGroup = buildArm();
+        this.leftUpperArmGroup = this.armGroup[0];
+        this.leftUpperArmGroup.position.set(15, 0, 0);
+        this.leftLowerArmGroup = this.armGroup[1];
+        this.leftHandGroup = this.armGroup[2];
+
+
+        // Right Arm
+        this.armGroup = buildArm();
+        this.rightUpperArmGroup = this.armGroup[0];
+        this.rightUpperArmGroup.position.set(-15, 0, 0);
+        this.rightLowerArmGroup = this.armGroup[1];
+        this.rightHandGroup = this.armGroup[2];
+
+        // Left Leg
+        this.legGroup = buildLeg();
+        this.leftUpperLegGroup = this.legGroup[0];
+        this.leftUpperLegGroup.position.set(15, -33, 0);
+        this.leftLowerLegGroup = this.legGroup[1];
+        this.leftFeetGroup = this.legGroup[2];
+
+        // Right Leg
+        this.legGroup = buildLeg();
+        this.rightUpperLegGroup = this.legGroup[0];
+        this.rightUpperLegGroup.position.set(-15, -33, 0);
+        this.rightLowerLegGroup = this.legGroup[1];
+        this.rightFeetGroup = this.legGroup[2];
+
+        // Head
+        this.headGroup = buildHead();
+
+        this.leftShoulder.add(this.leftUpperArmGroup)
+        this.rightShoulder.add(this.rightUpperArmGroup)
+        this.upperBodyGroup.add(this.headGroup);
+        this.lowerBodyGroup.add(this.rightUpperLegGroup, this.leftUpperLegGroup);
+
+        return this.body;
+      }
+    }
+
+
+    function fk(theta, joints) {
+      /*
+        // 不能這樣做，因為還在迭代階段，並沒有render
+        joints[0] = new THREE.Vector3();
+        joints[1] = link1.localToWorld (new THREE.Vector3(60,0,0))
+        joints[2] = link2.localToWorld (new THREE.Vector3(90,0,0))
+      */
+
+      joints[0] = new THREE.Vector3(0, 0, 0);
+
+      var m = new THREE.Matrix4();
+      // 這裡注意旋轉軸！！！！
+      m.makeRotationZ(theta[0]);
+      m.multiply(new THREE.Matrix4().makeTranslation(0, -L2, 0));
+      var localzero = new THREE.Vector3(0, 0, 0);
+      localzero.applyMatrix4(m);
+      joints[1].copy(localzero);
+
+      m.multiply(new THREE.Matrix4().makeRotationZ(theta[1]));
+      m.multiply(new THREE.Matrix4().makeTranslation(0, -L1, 0));
+      localzero.set(0, 0, 0);
+      localzero.applyMatrix4(m);
+      joints[2].copy(localzero);
+
+    }
+
+    function setarm() {
+      var axis = new CCD_axis(new THREE.Vector3(0, 0, 1), 0);
+      axis.limits = new THREE.Vector2(-Math.PI / 2, Math.PI / 2);
+      axes.push(axis);
+
+      var axis = new CCD_axis(new THREE.Vector3(0, 0, 1), 1);
+      axis.limits = new THREE.Vector2(-Math.PI, -0.01);
+      axes.push(axis);
+    }
+
+    // danceClock.stop();
 
     init();
     animate();
@@ -95,6 +391,8 @@
     function init() {
       soundTrack = document.getElementById('soundtrack');
       soundTrack.pause();
+      soundTrack2 = document.getElementById('soundtrack2');
+      soundTrack2.pause();
 
       scene = new THREE.Scene();
 
@@ -124,88 +422,165 @@
       floor.rotation.x = Math.PI / 2;
       scene.add(floor);
 
-      // Body
-      body = new THREE.Object3D();
-      upperBodyGroup = buildUpperTorso();
-      lowerBodyGroup = buildLowerTorso();
-      body.add(upperBodyGroup, lowerBodyGroup);
-      scene.add(body);
+      for (i = 0; i < 3; i++) {
+        model[i] = new DanceModel();
+        body = model[i].init();
+        // model[i].body.visible = false;
+      }
 
-      // Left Arm
-      var armGroup = buildArm();
-      leftUpperArmGroup = armGroup[0];
-      leftUpperArmGroup.position.set(30, 33, 0);
-      leftLowerArmGroup = armGroup[1];
-      leftHandGroup = armGroup[2];
+      // model[0].body.position.set(0, 128, 0);
+      model[0].body.position.set(-150, 128, 0);
+      model[1].body.position.set(150, 128, 0);
+      model[2].body.position.set(0, 128, 0);
 
 
-      // Right Arm
-      var armGroup = buildArm();
-      rightUpperArmGroup = armGroup[0];
-      rightUpperArmGroup.position.set(-30, 33, 0);
-      rightLowerArmGroup = armGroup[1];
-      rightHandGroup = armGroup[2];
+      for (i = 0; i < 6; i += 2) {
+        moveModel[i] = new MoveModel();
+        body = moveModel[i].init();
+        scene.add(body);
+        moveModel[i].body.visible = false
+        moveModel[i + 1] = new MoveModel();
+        body = moveModel[i + 1].init();
+        moveModel[i].body.add(moveModel[i + 1].body);
+        moveModel[i + 1].body.position.z = 30;
+        moveModel[i + 1].body.visible = false
+        moveModel[i + 1].upperBodyGroup.visible = false
+        moveModel[i + 1].lowerBodyGroup.visible = false
+      }
 
-      // Left Leg
-      var legGroup = buildLeg();
-      leftUpperLegGroup = legGroup[0];
-      leftUpperLegGroup.position.set(15, -33, 0);
-      leftLowerLegGroup = legGroup[1];
-      leftFeetGroup = legGroup[2];
+      moveModel[0].torsoTarget.set(-150, 0, 0);
+      moveModel[0].legTheta = Math.PI * 2 / 3;
+      moveModel[2].torsoTarget.set(150, 0, 0);
+      moveModel[2].legTheta = Math.PI / 3;
+      moveModel[4].legTheta = Math.PI * 3 / 2;
+      moveModel[4].isMove = false;
 
-      // Right Leg
-      var legGroup = buildLeg();
-      rightUpperLegGroup = legGroup[0];
-      rightUpperLegGroup.position.set(-15, -33, 0);
-      rightLowerLegGroup = legGroup[1];
-      rightFeetGroup = legGroup[2];
+      //dance gcontrol
+      // gcontrol = {
+      //   // Body
+      //   bodyX: 0.01,
+      //   bodyY: 128.1,
+      //   bodyZ: 0.1,
+      //   bodyRX: 0.001,
+      //   bodyRY: 0.001,
+      //   bodyRZ: 0.001,
+      //   // Upper Body
+      //   upperBodyX: 0.01,
+      //   upperBodyY: 0.01,
+      //   upperBodyZ: 0.01,
+      //   // Lower Body
+      //   lowerBodyX: 0.01,
+      //   lowerBodyY: 0.01,
+      //   lowerBodyZ: 0.01,
+      //   // Right Arm
+      //   rightUpperArmX: 0.01,
+      //   rightUpperArmY: 0.01,
+      //   rightUpperArmZ: 0.01,
+      //   rightLowerArmX: 0.01,
+      //   // Left Arm
+      //   leftUpperArmX: 0.01,
+      //   leftUpperArmY: 0.01,
+      //   leftUpperArmZ: 0.01,
+      //   leftLowerArmX: 0.01,
+      //   // Right Leg
+      //   rightUpperLegX: 0.01,
+      //   rightUpperLegY: 0.01,
+      //   rightUpperLegZ: 0.01,
+      //   rightLowerLegX: 0.01,
+      //   // Left Leg
+      //   leftUpperLegX: 0.01,
+      //   leftUpperLegY: 0.01,
+      //   leftUpperLegZ: 0.01,
+      //   leftLowerLegX: 0.01,
+      //   // Feet
+      //   rightFeetX: 0.01,
+      //   rightFeetZ: 0.01,
+      //   leftFeetX: 0.01,
+      //   leftFeetZ: 0.01,
+      //   // Hand
+      //   rightHandX: 0.1,
+      //   rightHandZ: 0.1,
+      //   leftHandX: 0.1,
+      //   leftHandZ: 0.1,
+      //   // Head
+      //   headX: 0.001,
+      //   headY: 0.001,
+      //   headZ: 0.001,
+      //   // Shoulder
+      //   rightShoulderY: 0.01,
+      //   rightShoulderZ: 0.01,
+      //   leftShoulderY: 0.01,
+      //   leftShoulderZ: 0.01,
+      // };
 
-      // Head
-      headGroup = buildHead();
+      // var gui = new dat.GUI({
+      //   load: loadJSON(),
+      //   //preset: "run"
+      // });
 
-      upperBodyGroup.add(headGroup, leftUpperArmGroup, rightUpperArmGroup);
-      lowerBodyGroup.add(leftUpperLegGroup, rightUpperLegGroup);
-      //gcontrol
+      // gui.domElement.id = 'gui';
+      // gui.remember(gcontrol);
+      // // Body
+      // gui.add(gcontrol, 'bodyX', -100, 100);
+      // gui.add(gcontrol, 'bodyY', -10, 200);
+      // gui.add(gcontrol, 'bodyZ', -100, 100);
+      // gui.add(gcontrol, 'bodyRX', -3, 3);
+      // gui.add(gcontrol, 'bodyRY', -3, 3);
+      // gui.add(gcontrol, 'bodyRZ', -3, 3);
+      // // Upper Body
+      // gui.add(gcontrol, 'upperBodyX', -3, 3);
+      // gui.add(gcontrol, 'upperBodyY', -3, 3);
+      // gui.add(gcontrol, 'upperBodyZ', -3, 3);
+      // // Lower Body
+      // gui.add(gcontrol, 'lowerBodyX', -3, 3);
+      // gui.add(gcontrol, 'lowerBodyY', -3, 3);
+      // gui.add(gcontrol, 'lowerBodyZ', -3, 3);
+      // // Right Arm
+      // gui.add(gcontrol, 'rightUpperArmX', -6, 6);
+      // gui.add(gcontrol, 'rightUpperArmY', -6, 6);
+      // gui.add(gcontrol, 'rightUpperArmZ', -6, 6);
+      // gui.add(gcontrol, 'rightLowerArmX', -6, 6);
+      // // Left Arm
+      // gui.add(gcontrol, 'leftUpperArmX', -6, 6);
+      // gui.add(gcontrol, 'leftUpperArmY', -6, 6);
+      // gui.add(gcontrol, 'leftUpperArmZ', -6, 6);
+      // gui.add(gcontrol, 'leftLowerArmX', -6, 6);
+      // // Right Leg
+      // gui.add(gcontrol, 'rightUpperLegX', -6, 1.5);
+      // gui.add(gcontrol, 'rightUpperLegY', -6, 1);
+      // gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
+      // gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
+      // // Left Leg
+      // gui.add(gcontrol, 'leftUpperLegX', -3, 1.5);
+      // gui.add(gcontrol, 'leftUpperLegY', -1, 1);
+      // gui.add(gcontrol, 'leftUpperLegZ', -2.5, 1.5);
+      // gui.add(gcontrol, 'leftLowerLegX', 0.1, 3);
+      // // Feet
+      // gui.add(gcontrol, 'rightFeetX', -3, 3);
+      // gui.add(gcontrol, 'rightFeetZ', -3, 3);
+      // gui.add(gcontrol, 'leftFeetX', -3, 3);
+      // gui.add(gcontrol, 'leftFeetZ', -3, 3);
+      // // Hand
+      // gui.add(gcontrol, 'rightHandX', -3, 3);
+      // gui.add(gcontrol, 'rightHandZ', -3, 3);
+      // gui.add(gcontrol, 'leftHandX', -3, 3);
+      // gui.add(gcontrol, 'leftHandZ', -3, 3);
+      // // Head
+      // gui.add(gcontrol, 'headX', -6, 6);
+      // gui.add(gcontrol, 'headY', -6, 6);
+      // gui.add(gcontrol, 'headZ', -6, 6);
+      // // Shoulder
+      // gui.add(gcontrol, 'rightShoulderY', -3, 3);
+      // gui.add(gcontrol, 'rightShoulderZ', -3, 3);
+      // gui.add(gcontrol, 'leftShoulderY', -3, 3);
+      // gui.add(gcontrol, 'leftShoulderZ', -3, 3);
 
+
+      // move gcontrol
       gcontrol = {
-        // Body
-        bodyX: 0.01,
-        bodyY: 128.1,
-        bodyZ: 0.1,
-        bodyRX: 0.001,
-        bodyRY: 0.001,
-        bodyRZ: 0.001,
-        upperBodyX: 0.1,
-        // Right Arm
-        rightUpperArmX: 0.01,
-        rightUpperArmZ: 0.01,
-        rightLowerArmX: 0.01,
-        rightLowerArmZ: 0.01,
-        // Left Arm
-        leftUpperArmX: 0.01,
-        leftUpperArmZ: 0.01,
-        leftLowerArmX: 0.01,
-        leftLowerArmZ: 0.01,
-        // Right Leg
-        rightUpperLegX: 0.01,
-        rightUpperLegZ: 0.01,
-        rightLowerLegX: 0.01,
-        rightLowerLegZ: 0.01,
-        // Left Leg
-        leftUpperLegX: 0.01,
-        leftUpperLegZ: 0.01,
-        leftLowerLegX: 0.01,
-        leftLowerLegZ: 0.01,
-        // Feet
-        rightFeetX: 0.01,
-        leftFeetX: 0.01,
-        // Hand
-        rightHandY: 0.1,
-        leftHandY: 0.1,
-        rightHandX: 0.1,
-        leftHandX: 0.1
+        leftModelTheta: Math.PI * 2 / 3,
+        rightModelTheta: Math.PI / 3
       };
-
       var gui = new dat.GUI({
         load: loadJSON(),
         //preset: "run"
@@ -213,48 +588,35 @@
 
       gui.domElement.id = 'gui';
       gui.remember(gcontrol);
-      // Body
-      gui.add(gcontrol, 'bodyX', -100, 100);
-      gui.add(gcontrol, 'bodyY', -10, 200);
-      gui.add(gcontrol, 'bodyZ', -100, 100);
-      gui.add(gcontrol, 'bodyRX', -3, 3);
-      gui.add(gcontrol, 'bodyRY', -3, 3);
-      gui.add(gcontrol, 'bodyRZ', -3, 3);
-      gui.add(gcontrol, 'upperBodyX', -3, 1.5);
-      // Right Arm
-      gui.add(gcontrol, 'rightUpperArmX', -3, 1.5);
-      gui.add(gcontrol, 'rightUpperArmZ', -2.5, 1.5);
-      gui.add(gcontrol, 'rightLowerArmX', -3, 0.1);
-      gui.add(gcontrol, 'rightLowerArmZ', -3, 3);
-      // Left Arm
-      gui.add(gcontrol, 'leftUpperArmX', -3, 1.5);
-      gui.add(gcontrol, 'leftUpperArmZ', -2.5, 1.5);
-      gui.add(gcontrol, 'leftLowerArmX', -3, 0.1);
-      gui.add(gcontrol, 'leftLowerArmZ', -3, 3);
-      // Right Leg
-      gui.add(gcontrol, 'rightUpperLegX', -3, 1.5);
-      gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
-      gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
-      gui.add(gcontrol, 'rightLowerLegZ', -0.5, 1.7);
-      // Left Leg
-      gui.add(gcontrol, 'leftUpperLegX', -3, 1.5);
-      gui.add(gcontrol, 'leftUpperLegZ', -2.5, 1.5);
-      gui.add(gcontrol, 'leftLowerLegX', 0.1, 3);
-      gui.add(gcontrol, 'leftLowerLegZ', -0.5, 1.7);
-      // Feet
-      gui.add(gcontrol, 'rightFeetX', -3, 3);
-      gui.add(gcontrol, 'leftFeetX', -3, 3);
-      // Hand
-      gui.add(gcontrol, 'rightHandY', -3, 3);
-      gui.add(gcontrol, 'leftHandY', -3, 3);
-      gui.add(gcontrol, 'rightHandX', -3, 3);
-      gui.add(gcontrol, 'leftHandX', -3, 3);
+      gui.add(gcontrol, 'leftModelTheta', -6.12, 6.12);
+      gui.add(gcontrol, 'rightModelTheta', -6.12, 6.12);
 
+
+      setarm();
     }
 
-    function keyframe(t) {
+    function keyframe(type, t) {
+      var keys = eval(document.getElementById("dance").value + "Keys");
+      var T = eval(document.getElementById("dance").value + "T");
 
-      var keys = eval(document.getElementById("dance").value);
+      if (type == 0) {
+        keys = walk2Keys;
+        T = walk2T;
+      }
+      else if (type == 1) {
+        keys = dance3Keys;
+        T = dance3T;
+      }
+      else if (type == 2) {
+        keys = dance6Keys;
+        T = dance6T;
+      }
+      else if (type == 3) {
+        keys = dance4Keys;
+        T = dance4T;
+      }
+
+
       var s = ((t - ts) % T) / T;
 
       for (var i = 1; i < keys.length; i++) {
@@ -264,97 +626,253 @@
       var ii = i - 1;
       var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
       var forwordKey = 'keys[ii][1].', backwardKey = 'keys[ii + 1][1].';
-
+      //console.log(danceClock.getElapsedTime(), moveClock.getElapsedTime())
       for (j = 0; j < guiNameString.length; j++) {
         intKey[j] = eval(forwordKey + guiNameString[j]) * (1 - a) + eval(backwardKey + guiNameString[j]) * a;
       }
 
     }
 
+    function keyframeMove(type, i) {
+      moveModel[i * 2].body.visible = false;
+      model[i].body.visible = true;
+
+      keyframe(type, danceClock.getElapsedTime());
+      var translationX = 0, translationZ = 0;
+      if (i == 1) {
+        translationX = 150;
+        translationZ = -200;
+      }
+      if (i == 2) {
+        translationX = -150;
+        translationZ = -200;
+      }
+
+      // Body position
+      model[i].body.position.x = intKey[0] + moveModel[i * 2].torsoTarget.x;
+      model[i].body.position.y = intKey[1];
+      model[i].body.position.z = intKey[2] + moveModel[i * 2].torsoTarget.z;
+
+
+      // Body rotation
+      model[i].body.eulerOrder = 'XYZ';
+      model[i].body.rotation.x = intKey[3];
+      model[i].body.rotation.y = intKey[4];
+      model[i].body.rotation.z = intKey[5];
+      // Upper Body
+      model[i].upperBodyGroup.rotation.x = intKey[6];
+      model[i].upperBodyGroup.rotation.y = intKey[7];
+      model[i].upperBodyGroup.rotation.z = intKey[8];
+      // Lower Body
+      model[i].lowerBodyGroup.rotation.x = intKey[9];
+      model[i].lowerBodyGroup.rotation.y = intKey[10];
+      model[i].lowerBodyGroup.rotation.z = intKey[11];
+      // Right Arm
+      model[i].rightUpperArmGroup.rotation.x = intKey[12];
+      model[i].rightUpperArmGroup.rotation.y = intKey[13];
+      model[i].rightUpperArmGroup.rotation.z = intKey[14];
+      model[i].rightLowerArmGroup.rotation.x = intKey[15];
+      // Left Arm
+      model[i].leftUpperArmGroup.rotation.x = intKey[16];
+      model[i].leftUpperArmGroup.rotation.y = intKey[17];
+      model[i].leftUpperArmGroup.rotation.z = intKey[18];
+      model[i].leftLowerArmGroup.rotation.x = intKey[19];
+      // Right Leg
+      model[i].rightUpperLegGroup.rotation.x = intKey[20];
+      model[i].rightUpperLegGroup.rotation.y = intKey[21];
+      model[i].rightUpperLegGroup.rotation.z = intKey[22];
+      model[i].rightLowerLegGroup.rotation.x = intKey[23];
+      // Left Leg
+      model[i].leftUpperLegGroup.rotation.x = intKey[24];
+      model[i].leftUpperLegGroup.rotation.y = intKey[25];
+      model[i].leftUpperLegGroup.rotation.z = intKey[26];
+      model[i].leftLowerLegGroup.rotation.x = intKey[27];
+      // Feet
+      model[i].rightFeetGroup.rotation.x = intKey[28];
+      model[i].rightFeetGroup.rotation.z = intKey[29];
+      model[i].leftFeetGroup.rotation.x = intKey[30];
+      model[i].leftFeetGroup.rotation.z = intKey[31];
+      // Hand
+      model[i].rightHandGroup.rotation.x = intKey[32];
+      model[i].rightHandGroup.rotation.z = intKey[33];
+      model[i].leftHandGroup.rotation.x = intKey[34];
+      model[i].leftHandGroup.rotation.z = intKey[35];
+      // Head
+      model[i].headGroup.rotation.x = intKey[36];
+      model[i].headGroup.rotation.y = intKey[37];
+      model[i].headGroup.rotation.z = intKey[38];
+    }
 
     function animate() {
-
-
-      if (isPaused) {
+      if (change == 1) {
         soundVal += sign * 0.01;
         soundVal = THREE.Math.clamp(soundVal, 0, 1);
         soundtrack.volume = soundVal;
+        soundtrack2.volume = soundVal;
+        for (i = 0; i < model.length; i++) {
+          // if (i == model.length - 1)
+          //   keyframeMove(1, i);
+          // else
 
-        keyframe(clock.getElapsedTime());
+          if (changePosition && i == model.length - 1)
+            keyframeMove(4, i);
+          else if (changePosition && i != model.length - 1)
+            keyframeMove(3, i);
+          else
+            keyframeMove(2, i);
+        }
 
-        // Body
-        body.position.x = intKey[0] + 20;
-        body.position.y = intKey[1];
-        body.position.z = intKey[2];
-        body.eulerOrder = 'XZY';
-        body.rotation.x = intKey[3];
-        body.rotation.y = intKey[4];
-        body.rotation.z = intKey[5];
-        upperBodyGroup.rotation.x = intKey[6];
-        // Right Arm
-        rightUpperArmGroup.rotation.x = intKey[7];
-        rightUpperArmGroup.rotation.z = intKey[8];
-        rightLowerArmGroup.rotation.x = intKey[9];
-        rightLowerArmGroup.rotation.z = intKey[10];
-        // Left Arm
-        leftUpperArmGroup.rotation.x = intKey[11];
-        leftUpperArmGroup.rotation.z = intKey[12];
-        leftLowerArmGroup.rotation.x = intKey[13];
-        leftLowerArmGroup.rotation.z = intKey[14];
-        // Right Leg
-        rightUpperLegGroup.rotation.x = intKey[15];
-        rightUpperLegGroup.rotation.z = intKey[16];
-        rightLowerLegGroup.rotation.x = intKey[17];
-        rightLowerLegGroup.rotation.z = intKey[18];
-        // Left Leg
-        leftUpperLegGroup.rotation.x = intKey[19];
-        leftUpperLegGroup.rotation.z = intKey[20];
-        leftLowerLegGroup.rotation.x = intKey[21];
-        leftLowerLegGroup.rotation.z = intKey[22];
-        // Feet
-        rightFeetGroup.rotation.x = intKey[23];
-        leftFeetGroup.rotation.x = intKey[24];
-        // Hand
-        rightHandGroup.rotation.y = intKey[25];
-        leftHandGroup.rotation.y = intKey[26];
-        rightHandGroup.rotation.x = intKey[27];
-        leftHandGroup.rotation.x = intKey[28];
       }
-      else {
-        body.eulerOrder = 'XZY';
-        body.position.x = gcontrol.bodyX;
-        body.position.y = gcontrol.bodyY;
-        body.position.z = gcontrol.bodyZ;
-        body.rotation.x = gcontrol.bodyRX;
-        body.rotation.y = gcontrol.bodyRY;
-        body.rotation.z = gcontrol.bodyRZ;
-        upperBodyGroup.rotation.x = gcontrol.upperBodyX;
-        leftUpperArmGroup.rotation.x = gcontrol.leftUpperArmX;
-        leftUpperArmGroup.rotation.z = gcontrol.leftUpperArmZ;
-        leftLowerArmGroup.rotation.x = gcontrol.leftLowerArmX;
-        leftLowerArmGroup.rotation.z = gcontrol.leftLowerArmZ;
-        rightUpperArmGroup.rotation.x = gcontrol.rightUpperArmX;
-        rightUpperArmGroup.rotation.z = gcontrol.rightUpperArmZ;
-        rightLowerArmGroup.rotation.x = gcontrol.rightLowerArmX;
-        rightLowerArmGroup.rotation.z = gcontrol.rightLowerArmZ;
-        leftUpperLegGroup.rotation.x = gcontrol.leftUpperLegX;
-        leftUpperLegGroup.rotation.z = gcontrol.leftUpperLegZ;
-        leftLowerLegGroup.rotation.x = gcontrol.leftLowerLegX;
-        leftLowerLegGroup.rotation.z = gcontrol.leftLowerLegZ;
-        rightUpperLegGroup.rotation.x = gcontrol.rightUpperLegX;
-        rightUpperLegGroup.rotation.z = gcontrol.rightUpperLegZ;
-        rightLowerLegGroup.rotation.x = gcontrol.rightLowerLegX;
-        rightLowerLegGroup.rotation.z = gcontrol.rightLowerLegZ;
-        leftFeetGroup.rotation.x = gcontrol.leftFeetX;
-        rightFeetGroup.rotation.x = gcontrol.rightFeetX;
-        rightHandGroup.rotation.y = gcontrol.rightHandY;
-        leftHandGroup.rotation.y = gcontrol.leftHandY;
-        rightHandGroup.rotation.x = gcontrol.rightHandX;
-        leftHandGroup.rotation.x = gcontrol.leftHandX;
+      else if (change == 3) {
+        for (i = 1; i < model.length; i++) {
+          model[i].body.visible = false;
+        }
+        var i = 0;
+        // Body Position
+        model[i].body.position.x = gcontrol.bodyX;
+        model[i].body.position.y = gcontrol.bodyY;
+        model[i].body.position.z = gcontrol.bodyZ;
+        // Body Rotation
+        model[i].body.eulerOrder = 'XYZ';
+        model[i].body.rotation.x = gcontrol.bodyRX;
+        model[i].body.rotation.y = gcontrol.bodyRY;
+        model[i].body.rotation.z = gcontrol.bodyRZ;
+        // Upper Body
+        model[i].upperBodyGroup.rotation.x = gcontrol.upperBodyX;
+        model[i].upperBodyGroup.rotation.y = gcontrol.upperBodyY;
+        model[i].upperBodyGroup.rotation.z = gcontrol.upperBodyZ;
+        // Lower Body
+        model[i].lowerBodyGroup.rotation.x = gcontrol.lowerBodyX;
+        model[i].lowerBodyGroup.rotation.y = gcontrol.lowerBodyY;
+        model[i].lowerBodyGroup.rotation.z = gcontrol.lowerBodyZ;
+        // Right Arm
+        model[i].rightUpperArmGroup.rotation.x = gcontrol.rightUpperArmX;
+        model[i].rightUpperArmGroup.rotation.y = gcontrol.rightUpperArmY;
+        model[i].rightUpperArmGroup.rotation.z = gcontrol.rightUpperArmZ;
+        model[i].rightLowerArmGroup.rotation.x = gcontrol.rightLowerArmX;
+        // Left Arm
+        model[i].leftUpperArmGroup.rotation.x = gcontrol.leftUpperArmX;
+        model[i].leftUpperArmGroup.rotation.y = gcontrol.leftUpperArmY;
+        model[i].leftUpperArmGroup.rotation.z = gcontrol.leftUpperArmZ;
+        model[i].leftLowerArmGroup.rotation.x = gcontrol.leftLowerArmX;
+        // Right Leg
+        model[i].rightUpperLegGroup.rotation.x = gcontrol.rightUpperLegX;
+        model[i].rightUpperLegGroup.rotation.y = gcontrol.rightUpperLegY;
+        model[i].rightUpperLegGroup.rotation.z = gcontrol.rightUpperLegZ;
+        model[i].rightLowerLegGroup.rotation.x = gcontrol.rightLowerLegX;
+        // Left Leg
+        model[i].leftUpperLegGroup.rotation.x = gcontrol.leftUpperLegX;
+        model[i].leftUpperLegGroup.rotation.y = gcontrol.leftUpperLegY;
+        model[i].leftUpperLegGroup.rotation.z = gcontrol.leftUpperLegZ;
+        model[i].leftLowerLegGroup.rotation.x = gcontrol.leftLowerLegX;
+        // Feet
+        model[i].rightFeetGroup.rotation.x = gcontrol.rightFeetX;
+        model[i].rightFeetGroup.rotation.z = gcontrol.rightFeetZ;
+        model[i].leftFeetGroup.rotation.x = gcontrol.leftFeetX;
+        model[i].leftFeetGroup.rotation.z = gcontrol.leftFeetZ;
+        // Hand
+        model[i].rightHandGroup.rotation.x = gcontrol.rightHandX;
+        model[i].rightHandGroup.rotation.z = gcontrol.rightHandZ;
+        model[i].leftHandGroup.rotation.x = gcontrol.leftHandX;
+        model[i].leftHandGroup.rotation.z = gcontrol.leftHandZ;
+        // Head
+        model[i].headGroup.rotation.x = gcontrol.headX;
+        model[i].headGroup.rotation.y = gcontrol.headY;
+        model[i].headGroup.rotation.z = gcontrol.headZ;
+        // Shoulder
+        model[i].rightShoulder.rotation.y = gcontrol.rightShoulderY;
+        model[i].rightShoulder.rotation.z = gcontrol.rightShoulderZ;
+        model[i].leftShoulder.rotation.y = gcontrol.leftShoulderY;
+        model[i].leftShoulder.rotation.z = gcontrol.leftShoulderZ;
+      }
+      else if (change == 2) {
+        if (first) {
+          moveModel[0].legTheta = gcontrol.leftModelTheta;
+          moveModel[2].legTheta = gcontrol.rightModelTheta;
+          for (i = 0; i < moveModel.length; i += 2) {
+            moveModel[i].reset();
+          }
+          console.log(gcontrol.leftModelTheta)
+
+          first = 0;
+        }
+        else {
+          update();
+          changePosition = true;
+          // setTimeout(function () {
+          //   update();
+          // }, 500);
+
+        }
+
       }
 
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
+    }
+
+    function update() {
+      var Ts = 0.5; // 週期
+      var time = moveClock.getElapsedTime(); // 過去時間，配合clock.start()
+      // console.log
+
+      var V = Ls / Ts; // Ls為一步長度
+      var n = Math.floor(moveModel[0].dt / Ts);
+      var tt = moveModel[0].dt % Ts;
+      var legMoveX = 2 * Ls * time / Ts; // 原始x軸移動量
+      thetaGroin = 0.31
+      thetaKnee = 0.6
+      for (i = 0; i < moveModel.length; i += 2) {
+        if (moveModel[i].isMove == false) {
+          keyframeMove(0, i / 2);
+          continue;
+        }
+
+        moveModel[i].upperLegGroup.rotation.z = thetaGroin;
+        moveModel[i].lowerLegGroup.rotation.z = -thetaKnee;
+        moveModel[i + 1].upperLegGroup.rotation.z = thetaGroin;
+        moveModel[i + 1].lowerLegGroup.rotation.z = -thetaKnee;
+
+        moveModel[i].dt += time; // 累計時間
+
+        var moveX = Ls / 2 + Ls * moveModel[i].dt / Ts;
+        moveModel[i].torsoTarget = new THREE.Vector3(moveX * Math.cos(moveModel[i].legTheta) + moveModel[i].preTorsoTarget.x, Hh - Hr / 2 * Math.cos(2 * Math.PI * moveModel[i].dt / Ts), (-moveX) * Math.sin(moveModel[i].legTheta) + moveModel[i].preTorsoTarget.z);
+        moveModel[i].body.position.copy(moveModel[i].torsoTarget);
+
+        if (n % 2 === 0) {
+          moveModel[i].x1 += legMoveX * Math.cos(moveModel[i].legTheta);
+          moveModel[i].y1 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts))
+          moveModel[i].z1 -= legMoveX * Math.sin(moveModel[i].legTheta);
+        } else {
+          moveModel[i].x2 += legMoveX * Math.cos(moveModel[i].legTheta);
+          moveModel[i].y2 = Fc / 2 - Fc / 2 * Math.cos(2 * Math.PI * tt / (Ts));
+          moveModel[i].z2 -= legMoveX * Math.sin(moveModel[i].legTheta);
+        }
+
+        var walkTarget1 = new THREE.Vector3(moveModel[i].x1, moveModel[i].y1, moveModel[i].z1);
+        moveModel[i].body.worldToLocal(walkTarget1);
+        thetas = [moveModel[i].theta1, moveModel[i].theta2];
+        moveModel[i].target.copy(walkTarget1);
+        ik_ccd(moveModel[i].target, thetas);
+        moveModel[i].update(thetas);
+
+
+        var walkTarget2 = new THREE.Vector3(moveModel[i].x2, moveModel[i].y2, moveModel[i].z2);
+        moveModel[i + 1].body.worldToLocal(walkTarget2);
+        thetas = [moveModel[i + 1].theta1, moveModel[i + 1].theta2];
+        moveModel[i + 1].target.copy(walkTarget2);
+        ik_ccd(moveModel[i + 1].target, thetas);
+        moveModel[i + 1].update(thetas);
+      }
+
+      moveClock.start();
+
+      // var theta = [theta1, theta2];
+      // ik_ccd(target, theta);
+      // link1.rotation.z = theta[0]
+      // link2.rotation.z = theta[1]
+      // bodyLink.upperLegGroup.rotation.z = theta[0]
+      // bodyLink.lowerLegGroup.rotation.z = theta[1]
     }
 
   </script>

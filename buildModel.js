@@ -3,10 +3,21 @@ function buildUpperTorso() {
     waist = new THREE.Mesh(new THREE.SphereGeometry(8, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
     upperTorso = new THREE.Mesh(new THREE.CylinderGeometry(30, 10, 30, 5), new THREE.MeshPhongMaterial({ color: 0xff88ff }));
     upperTorso.position.set(0, 20, 0);
-
     waist.add(upperTorso);
     Group.add(waist);
-    return Group;
+
+    leftShoulder = new THREE.Object3D();
+    leftClavicle = new THREE.Mesh(new THREE.BoxGeometry(30, 5, 10), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    leftShoulder.position.set(15, 15, 0);
+    leftShoulder.add(leftClavicle);
+
+    rightShoulder = new THREE.Object3D();
+    rightClavicle = new THREE.Mesh(new THREE.BoxGeometry(30, 5, 10), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    rightShoulder.position.set(-15, 15, 0);
+    rightShoulder.add(rightClavicle);
+    upperTorso.add(leftShoulder, rightShoulder);
+
+    return [Group, leftShoulder, rightShoulder];
 }
 
 function buildLowerTorso() {
