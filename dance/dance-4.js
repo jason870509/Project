@@ -250,7 +250,8 @@ stepRight2 = {
     headZ: 0.001
 }
 
-var dance4T = 2.83;
+var dance4T = 2.82;
+// 4拍 1拍0.25
 var dance4Keys = [
     [0, stand],
     [0.05, stepLeft1],

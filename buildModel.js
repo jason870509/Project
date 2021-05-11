@@ -3,16 +3,23 @@ function buildUpperTorso() {
     waist = new THREE.Mesh(new THREE.SphereGeometry(8, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
     upperTorso = new THREE.Mesh(new THREE.CylinderGeometry(30, 10, 30, 5), new THREE.MeshPhongMaterial({ color: 0xff88ff }));
     upperTorso.position.set(0, 20, 0);
+    upperTorso.castShadow = true;
+    upperTorso.receiveShadow = true;
     waist.add(upperTorso);
     Group.add(waist);
 
     leftShoulder = new THREE.Object3D();
     leftClavicle = new THREE.Mesh(new THREE.BoxGeometry(30, 5, 10), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    leftClavicle.castShadow = true;
+    leftClavicle.receiveShadow = true;
     leftShoulder.position.set(15, 15, 0);
     leftShoulder.add(leftClavicle);
 
+
     rightShoulder = new THREE.Object3D();
     rightClavicle = new THREE.Mesh(new THREE.BoxGeometry(30, 5, 10), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    rightClavicle.castShadow = true;
+    rightClavicle.receiveShadow = true;
     rightShoulder.position.set(-15, 15, 0);
     rightShoulder.add(rightClavicle);
     upperTorso.add(leftShoulder, rightShoulder);
@@ -23,6 +30,8 @@ function buildUpperTorso() {
 function buildLowerTorso() {
     Group = new THREE.Object3D();
     lowerTorso = new THREE.Mesh(new THREE.CylinderGeometry(15, 10, 25, 32), new THREE.MeshPhongMaterial({ color: 0xff88ff }));
+    lowerTorso.castShadow = true;
+    lowerTorso.receiveShadow = true;
     lowerTorso.position.set(0, -18, 0);
     Group.add(lowerTorso);
     return Group;
@@ -32,23 +41,36 @@ function buildArm() {
     upperArmGroup = new THREE.Object3D();
 
     var shoulder = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    shoulder.castShadow = true;
+    shoulder.receiveShadow = true;
     var upperArm = new THREE.Mesh(new THREE.BoxGeometry(8, 40, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    upperArm.castShadow = true;
+    upperArm.receiveShadow = true;
     upperArm.position.y = -20;
 
     lowerArmGroup = new THREE.Object3D();
     lowerArmGroup.position.set(0, -40, 0);
 
     var elbow = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
-
+    elbow.castShadow = true;
+    elbow.receiveShadow = true;
     var lowerArm = new THREE.Mesh(new THREE.BoxGeometry(8, 40, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    lowerArm.castShadow = true;
+    lowerArm.receiveShadow = true;
     lowerArm.position.y = -20;
 
     handGroup = new THREE.Object3D();
     handGroup.position.set(0, -43, 0);
     handJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    handJoint.castShadow = true;
+    handJoint.receiveShadow = true;
     hand = new THREE.Mesh(new THREE.BoxGeometry(5, 20, 10), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    hand.castShadow = true;
+    hand.receiveShadow = true;
     hand.position.set(0, -12, 0);
     hand2 = new THREE.Mesh(new THREE.BoxGeometry(5, 10, 5), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    hand2.castShadow = true;
+    hand2.receiveShadow = true;
     hand2.position.set(0, -8, 6);
 
     handGroup.add(handJoint, hand, hand2);
@@ -61,20 +83,32 @@ function buildLeg() {
     upperLegGroup = new THREE.Object3D();
 
     var upperLegJoint = new THREE.Mesh(new THREE.SphereGeometry(7, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    upperLegJoint.castShadow = true;
+    upperLegJoint.receiveShadow = true;
     var upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 52, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    upperLeg.castShadow = true;
+    upperLeg.receiveShadow = true;
     upperLeg.position.y = -20;
 
     lowerLegGroup = new THREE.Object3D();
     lowerLegGroup.position.set(0, -40, 0);
 
     var knee = new THREE.Mesh(new THREE.SphereGeometry(6, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    knee.castShadow = true;
+    knee.receiveShadow = true;
     var lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 48, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+    lowerLeg.castShadow = true;
+    lowerLeg.receiveShadow = true;
     lowerLeg.position.y = -20;
 
     feetGroup = new THREE.Object3D();
     feetGroup.position.set(0, -43, 0);
     feetJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+    feetJoint.castShadow = true;
+    feetJoint.receiveShadow = true;
     feet = new THREE.Mesh(new THREE.BoxGeometry(10, 7, 30), new THREE.MeshPhongMaterial({ color: 0xff0000 }));
+    feet.castShadow = true;
+    feet.receiveShadow = true;
     feet.position.set(0, -5, 10);
 
     feetGroup.add(feetJoint, feet);
@@ -135,8 +169,11 @@ function buildHead() {
     headGroup.position.set(0, 40, 0);
 
     headJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
-
+    headJoint.castShadow = true;
+    headJoint.receiveShadow = true;
     head = new THREE.Mesh(new THREE.CylinderGeometry(10, 5, 20, 80), new THREE.MeshPhongMaterial({ color: 0xff00ff }))
+    head.castShadow = true;
+    head.receiveShadow = true;
     head.position.set(0, 10, 0);
     face = new THREE.Mesh(new THREE.BoxGeometry(18, 8, 5), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
     face.position.set(0, 5, 10);

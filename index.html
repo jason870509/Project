@@ -34,6 +34,13 @@
       <option value="dance5">dance-4</option>
       <option value="dance6">dance-5</option>
     </select>
+    <select name="music" id="music">
+      <option value="sounds/megufire-82.mp3">Please select music</option>
+      <option value="sounds/megufire-82.mp3">megufire</option>
+      <option value="sounds/rap_beat-85.mp3">rap_beat</option>
+      <option value="sounds/rock_you-81.mp3">rock_you</option>
+
+    </select>
   </div>
   <script src="./js/three.js"></script>
   <script src="./js/OrbitControls.js"></script>
@@ -41,12 +48,7 @@
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
 
-  <audio id="soundtrack" autoplay loop style="display:none">
-    <source src="sounds/rap_beat.mp3" type='audio/wav'>
-  </audio>
-  <audio id="soundtrack2" autoplay loop style="display:none">
-    <source src="sounds/xphk1-4y51d.mp3" type='audio/wav'>
-  </audio>
+  <audio id="soundtrack" src="sounds/megufire-82.mp3" type='audio/wav' autoplay loop style="display:none"></audio>
 
   <script src="buildModel.js"></script>
   <script src="./dance/walk.js"></script>
@@ -80,8 +82,11 @@
     var change = 0;
     var dacne = 1;
     var changePosition = false;
+    var changeMusic = true, changeT = true;
+    var premusic = document.getElementById("dance").value;
 
     var soundTrack, soundTrack2;
+    var bpm1 = "", bpm2 = "";
     var isPaused = false;
     var isDimming = false, soundVal = 1.0, sign = 1.0;
 
@@ -112,7 +117,7 @@
         if (changePosition)
           soundTrack.play();
         else
-          soundTrack2.play();
+          soundTrack.play();
         $('#play').text('Dance');
       }
       else if (change == 2) { // Move
@@ -126,7 +131,7 @@
         }
         moveClock.start();
         soundTrack.pause();
-        soundTrack2.pause();
+        // soundTrack2.pause();
         $('#play').text('Move');
       }
       else if (change == 3) { // GUI
@@ -138,7 +143,7 @@
         }
         danceClock.stop();
         soundTrack.pause();
-        soundTrack2.pause();
+        // soundTrack2.pause();
         $('#play').text('GUI');
       }
     });
@@ -199,20 +204,32 @@
         this.upperLegGroup = new THREE.Object3D();
 
         this.upperLegJoint = new THREE.Mesh(new THREE.SphereGeometry(7, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.upperLegJoint.castShadow = true;
+        this.upperLegJoint.receiveShadow = true;
         this.upperLeg = new THREE.Mesh(new THREE.BoxGeometry(12, 52, 12), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.upperLeg.castShadow = true;
+        this.upperLeg.receiveShadow = true;
         this.upperLeg.position.y = -26;
 
         this.lowerLegGroup = new THREE.Object3D();
         this.lowerLegGroup.position.set(0, -52, 0);
 
         this.knee = new THREE.Mesh(new THREE.SphereGeometry(6, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.knee.castShadow = true;
+        this.knee.receiveShadow = true;
         this.lowerLeg = new THREE.Mesh(new THREE.BoxGeometry(8, 48, 8), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.lowerLeg.castShadow = true;
+        this.lowerLeg.receiveShadow = true;
         this.lowerLeg.position.y = -24;
 
         this.feetGroup = new THREE.Object3D();
         this.feetGroup.position.set(0, -45, 0);
         this.feetJoint = new THREE.Mesh(new THREE.SphereGeometry(5, 80), new THREE.MeshPhongMaterial({ color: 0xffff00 }));
+        this.feetJoint.castShadow = true;
+        this.feetJoint.receiveShadow = true;
         this.feet = new THREE.Mesh(new THREE.BoxGeometry(30, 7, 10), new THREE.MeshPhongMaterial({ color: 0xff00ff }));
+        this.feet.castShadow = true;
+        this.feet.receiveShadow = true;
         this.feet.position.set(10, 0, 0);
         this.feet.rotation.z = 0.1;
         this.feetGroup.add(this.feetJoint, this.feet);
@@ -250,7 +267,14 @@
         this.body.rotation.x = 0.01;
         this.body.rotation.y = this.legTheta;
         this.body.rotation.z = 0.01;
-        this.upperBodyGroup.rotation.x = 0.01;;
+        // Upper Body
+        this.upperBodyGroup.rotation.x = 0.01;
+        this.upperBodyGroup.rotation.y = 0.01;
+        this.upperBodyGroup.rotation.z = 0.01;
+        // Lower Body
+        this.lowerBodyGroup.rotation.x = 0.01;
+        this.lowerBodyGroup.rotation.y = 0.01;
+        this.lowerBodyGroup.rotation.z = 0.01;
         // Right Arm
         this.rightUpperArmGroup.rotation.x = 0.01;
         this.rightUpperArmGroup.rotation.y = 0.01;
@@ -283,7 +307,7 @@
         this.leftHandGroup.rotation.z = 0.01;
         // Head
         this.headGroup.rotation.x = 0.01;
-        this.headGroup.rotation.y = 0.01;
+        this.headGroup.rotation.y = Math.PI / 2;
         this.headGroup.rotation.z = 0.01;
       }
     }
@@ -300,6 +324,7 @@
 
         this.bodyGroup = buildUpperTorso();
         this.upperBodyGroup = this.bodyGroup[0];
+
         this.leftShoulder = this.bodyGroup[1];
         this.rightShoulder = this.bodyGroup[2];
         this.lowerBodyGroup = buildLowerTorso();
@@ -391,8 +416,9 @@
     function init() {
       soundTrack = document.getElementById('soundtrack');
       soundTrack.pause();
-      soundTrack2 = document.getElementById('soundtrack2');
-      soundTrack2.pause();
+      // soundTrack2 = document.getElementById('soundtrack2');
+      // soundTrack2.pause();
+
 
       scene = new THREE.Scene();
 
@@ -403,13 +429,27 @@
       renderer = new THREE.WebGLRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setClearColor(0x888888);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFShadowMap;
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       document.body.appendChild(renderer.domElement);
 
-      light = new THREE.PointLight(0x888888);
-      light.position.set(0, 300, 0);
+      // light = new THREE.PointLight(0x888888);
+      // light.position.set(0, 300, 0);
+      // spotlight
+      light = new THREE.SpotLight(0x888888, 1.5);
+      light.position.set(0, 500, 80);
+      light.angle = Math.PI / 3;
+      light.penumbra = 0.5;
       scene.add(light);
+      // shadow map settings
+      light.castShadow = true;
+      light.shadow.mapSize.width = 4096;
+      light.shadow.mapSize.height = 4096;
+      light.shadow.camera.near = 1;
+      light.shadow.camera.far = 800;
+      light.shadow.camera.fov = light.angle / Math.PI * 180 * 2;
 
       var amblight = new THREE.AmbientLight(0x444444); // soft white light
       scene.add(amblight);
@@ -420,6 +460,7 @@
       //////////////////////////////////////////////////////////////////////////////
       var floor = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshPhongMaterial({ color: 0x888888, side: THREE.DoubleSide }));
       floor.rotation.x = Math.PI / 2;
+      floor.receiveShadow = true;
       scene.add(floor);
 
       for (i = 0; i < 3; i++) {
@@ -598,25 +639,55 @@
     function keyframe(type, t) {
       var keys = eval(document.getElementById("dance").value + "Keys");
       var T = eval(document.getElementById("dance").value + "T");
+      var music = document.getElementById("music").value;
+      if (premusic != music) {
+        document.getElementById('soundtrack').src = document.getElementById("music").value;
+        changeMusic = true;
+        premusic = music;
+        console.log(premusic)
+      }
 
+
+      bpm1 = "";
+      for (i = 0; i < document.getElementById('soundtrack').src.length; i++) {
+        if (document.getElementById('soundtrack').src[i] == '-')
+          for (j = i + 1; j < document.getElementById('soundtrack').src.length; j++) {
+            if (document.getElementById('soundtrack').src[j] == '.')
+              break;
+            bpm1 = bpm1.concat(document.getElementById('soundtrack').src[j])
+          }
+      }
+      console.log(bpm1);
       if (type == 0) {
         keys = walk2Keys;
         T = walk2T;
+        T = 60 / parseInt(bpm1, 10) * 8;
       }
       else if (type == 1) {
         keys = dance3Keys;
         T = dance3T;
+        T = 60 / parseInt(bpm1, 10) * 8;
       }
       else if (type == 2) {
         keys = dance6Keys;
         T = dance6T;
+        T = 60 / parseInt(bpm1, 10) * 8;
+
       }
       else if (type == 3) {
         keys = dance4Keys;
         T = dance4T;
+        T = 60 / parseInt(bpm1, 10) * 4;
       }
+      else {
+        T = 60 / parseInt(bpm1, 10) * 8;
+      }
+      // if (changeMusic || changeT) {
 
 
+      // }
+
+      // console.log(T)
       var s = ((t - ts) % T) / T;
 
       for (var i = 1; i < keys.length; i++) {
@@ -708,14 +779,16 @@
         soundVal += sign * 0.01;
         soundVal = THREE.Math.clamp(soundVal, 0, 1);
         soundtrack.volume = soundVal;
-        soundtrack2.volume = soundVal;
+        // soundtrack2.volume = soundVal;
         for (i = 0; i < model.length; i++) {
           // if (i == model.length - 1)
           //   keyframeMove(1, i);
           // else
 
-          if (changePosition && i == model.length - 1)
+          if (changePosition && i == model.length - 1) {
             keyframeMove(4, i);
+
+          }
           else if (changePosition && i != model.length - 1)
             keyframeMove(3, i);
           else
@@ -792,9 +865,12 @@
           for (i = 0; i < moveModel.length; i += 2) {
             moveModel[i].reset();
           }
-          console.log(gcontrol.leftModelTheta)
+          // console.log(gcontrol.leftModelTheta)
 
           first = 0;
+          // document.getElementById('soundtrack').src = "sounds/rap_beat-85.mp3";
+          // console.log(document.getElementById('soundtrack').src);
+          soundTrack.pause();
         }
         else {
           update();

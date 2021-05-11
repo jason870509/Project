@@ -722,8 +722,9 @@ var step5 = {
     "headY": 0.001,
     "headZ": 0.001
 }
-var dance6T = 5.65;
-
+var dance6T = 2.92 * 2;
+// bpm = 82
+// 60 / bpm * 4 = 2.92
 var dance6Keys = [
     [0, step1],
     [0.02, step1_1],

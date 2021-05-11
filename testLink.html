@@ -24,7 +24,7 @@
   <div id="info">Dancing Man<br>
     <button id="play" style="width:10%">Dance</button><br>
     <select name="dance" id="dance">
-      <option value="dance6">Please select dance</option>
+      <option value="dance5">Please select dance</option>
       <option value="walk">walk</option>
       <option value="walk2">walk-2</option>
       <option value="jump">jump</option>
@@ -40,6 +40,8 @@
   <script src="./js/dat.gui.min.js"></script>
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
+  <script src="./json/dance.json"></script>
+  <script src="./json/getJson.js"></script>
   <audio id="soundtrack2" autoplay loop style="display:none">
     <source src="sounds/rock_you.mp3" type='audio/wav'>
   </audio>
@@ -48,14 +50,16 @@
   </audio>
 
   <script src="buildModel.js"></script>
+  <script src="save_angle.js"></script>
   <script src="./dance/walk.js"></script>
   <script src="./dance/jump.js"></script>
   <script src="./dance/dance-1.js"></script>
   <script src="./dance/dance-3.js"></script>
   <script src="./dance/dance-4.js"></script>
   <script src="./dance/walk2.js"></script>
-  <script src="./dance/dance-5.js"></script>
+
   <script src="./dance/dance-6.js"></script>
+  <script src="./dance/dance-5.js"></script>
   <script src="./Walking Simulator/js/ccdbox.js"></script>
   <script>
 
@@ -92,6 +96,9 @@
     var axes = [];
     var joints = new THREE.Vector3();
     var first = 1;
+
+
+
 
     $('#play').click(function () {
       change += 1;
@@ -229,7 +236,6 @@
       reset() {
         this.dt = 0;
         this.preTorsoTarget = this.torsoTarget;
-        //console.log(this.torsoTarget)
         this.x1 = this.preTorsoTarget.x;
         this.x2 = 53 * Math.cos(this.legTheta) + this.preTorsoTarget.x;
         this.z1 = this.preTorsoTarget.z;
@@ -606,7 +612,6 @@
       var ii = i - 1;
       var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
       var forwordKey = 'keys[ii][1].', backwardKey = 'keys[ii + 1][1].';
-      //console.log(danceClock.getElapsedTime(), moveClock.getElapsedTime())
       for (j = 0; j < guiNameString.length; j++) {
         intKey[j] = eval(forwordKey + guiNameString[j]) * (1 - a) + eval(backwardKey + guiNameString[j]) * a;
       }
@@ -703,7 +708,6 @@
       }
       else if (change == 0) {
         var i = 0;
-        console.log("GUI")
         // Body Position
         model[i].body.position.x = gcontrol.bodyX;
         model[i].body.position.y = gcontrol.bodyY;
@@ -730,7 +734,9 @@
         model[i].leftUpperArmGroup.rotation.x = gcontrol.leftUpperArmX;
         model[i].leftUpperArmGroup.rotation.y = gcontrol.leftUpperArmY;
         model[i].leftUpperArmGroup.rotation.z = gcontrol.leftUpperArmZ;
-        model[i].leftLowerArmGroup.rotation.x = gcontrol.leftLowerArmX;
+        model[i].leftLowerArmGroup.rotation.x = (left_elbow_x[left_elbow_index] - 180) * (Math.PI / 180)
+        left_elbow_index += 1;
+        // model[i].leftLowerArmGroup.rotation.x = gcontrol.leftLowerArmX;
         // Right Leg
         model[i].rightUpperLegGroup.rotation.x = gcontrol.rightUpperLegX;
         model[i].rightUpperLegGroup.rotation.y = gcontrol.rightUpperLegY;
@@ -763,7 +769,6 @@
           for (i = 0; i < moveModel.length; i += 2) {
             moveModel[i].reset();
           }
-          console.log(gcontrol.leftModelTheta)
 
           first = 0;
         }
@@ -785,7 +790,7 @@
     function update() {
       var Ts = 0.5; // 週期
       var time = moveClock.getElapsedTime(); // 過去時間，配合clock.start()
-      // console.log
+
 
       var V = Ls / Ts; // Ls為一步長度
       var n = Math.floor(moveModel[0].dt / Ts);
