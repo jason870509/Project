@@ -35,13 +35,14 @@
       <option value="dance6">dance-4</option>
     </select>
   </div>
+  <script src="./json/getJson.js"></script>
   <script src="./js/three.js"></script>
   <script src="./js/OrbitControls.js"></script>
   <script src="./js/dat.gui.min.js"></script>
   <script src="./js/KeyboardState.js"></script>
   <script src="./js/jquery-2.1.4.min.js"></script>
   <script src="./json/dance.json"></script>
-  <script src="./json/getJson.js"></script>
+
   <audio id="soundtrack2" autoplay loop style="display:none">
     <source src="sounds/rock_you.mp3" type='audio/wav'>
   </audio>
@@ -97,7 +98,7 @@
     var joints = new THREE.Vector3();
     var first = 1;
 
-
+    var pp = 0;
 
 
     $('#play').click(function () {
@@ -388,6 +389,7 @@
     animate();
 
     function init() {
+
       soundTrack = document.getElementById('soundtrack');
       soundTrack.pause();
       soundTrack2 = document.getElementById('soundtrack2');
@@ -540,7 +542,7 @@
       gui.add(gcontrol, 'leftUpperArmZ', -6, 6);
       gui.add(gcontrol, 'leftLowerArmX', -6, 6);
       // Right Leg
-      gui.add(gcontrol, 'rightUpperLegX', -6, 1.5);
+      gui.add(gcontrol, 'rightUpperLegX', -3, 1.5);
       gui.add(gcontrol, 'rightUpperLegY', -6, 1);
       gui.add(gcontrol, 'rightUpperLegZ', -2.5, 1.5);
       gui.add(gcontrol, 'rightLowerLegX', 0.1, 3);
@@ -602,14 +604,15 @@
       //   T = dance4T;
       // }
 
-
+      // console.log(document.getElementById("dance").value);
       var s = ((t - ts) % T) / T;
 
       for (var i = 1; i < keys.length; i++) {
         if (keys[i][0] > s) { break; }
       }
-
+      // console.log(jsonData[0]);
       var ii = i - 1;
+      console.log(ii)
       var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
       var forwordKey = 'keys[ii][1].', backwardKey = 'keys[ii + 1][1].';
       for (j = 0; j < guiNameString.length; j++) {
@@ -708,6 +711,7 @@
       }
       else if (change == 0) {
         var i = 0;
+        setTimeout(5)
         // Body Position
         model[i].body.position.x = gcontrol.bodyX;
         model[i].body.position.y = gcontrol.bodyY;
@@ -726,22 +730,31 @@
         model[i].lowerBodyGroup.rotation.y = gcontrol.lowerBodyY;
         model[i].lowerBodyGroup.rotation.z = gcontrol.lowerBodyZ;
         // Right Arm
-        model[i].rightUpperArmGroup.rotation.x = gcontrol.rightUpperArmX;
+        model[i].rightUpperArmGroup.rotation.x = -parseInt(jsonData[pp]['right_shoulder_x']) * (Math.PI / 180);
+        // model[i].rightUpperArmGroup.rotation.x = gcontrol.rightUpperArmX;
         model[i].rightUpperArmGroup.rotation.y = gcontrol.rightUpperArmY;
         model[i].rightUpperArmGroup.rotation.z = gcontrol.rightUpperArmZ;
-        model[i].rightLowerArmGroup.rotation.x = gcontrol.rightLowerArmX;
+        model[i].rightLowerArmGroup.rotation.x = -parseInt(jsonData[pp]['right_elbow_x']) * (Math.PI / 180);
+        // model[i].rightLowerArmGroup.rotation.x = gcontrol.rightLowerArmX;
         // Left Arm
-        model[i].leftUpperArmGroup.rotation.x = gcontrol.leftUpperArmX;
+
+        // model[i].leftUpperArmGroup.rotation.x = gcontrol.leftUpperArmX;
+        model[i].leftUpperArmGroup.rotation.x = -parseInt(jsonData[pp]['left_shoulder_x']) * (Math.PI / 180);
         model[i].leftUpperArmGroup.rotation.y = gcontrol.leftUpperArmY;
         model[i].leftUpperArmGroup.rotation.z = gcontrol.leftUpperArmZ;
-        model[i].leftLowerArmGroup.rotation.x = (left_elbow_x[left_elbow_index] - 180) * (Math.PI / 180)
-        left_elbow_index += 1;
+        model[i].leftLowerArmGroup.rotation.x = -parseInt(jsonData[pp]['left_elbow_x']) * (Math.PI / 180);
+        pp += 1
+        if (pp > 130) pp = 0
         // model[i].leftLowerArmGroup.rotation.x = gcontrol.leftLowerArmX;
         // Right Leg
-        model[i].rightUpperLegGroup.rotation.x = gcontrol.rightUpperLegX;
+        model[i].rightUpperLegGroup.rotation.x = -(parseInt(jsonData[pp]['right_hip_x']) - 180) * (Math.PI / 180);
+        // console.log(parseInt(jsonData[pp]['right_hip_x']) * (Math.PI / 180))
+        // model[i].rightUpperLegGroup.rotation.x = gcontrol.rightUpperLegX;
         model[i].rightUpperLegGroup.rotation.y = gcontrol.rightUpperLegY;
         model[i].rightUpperLegGroup.rotation.z = gcontrol.rightUpperLegZ;
-        model[i].rightLowerLegGroup.rotation.x = gcontrol.rightLowerLegX;
+        // model[i].rightLowerLegGroup.rotation.x = gcontrol.rightLowerLegX;
+        model[i].rightLowerLegGroup.rotation.x = -(parseInt(jsonData[pp]['right_knee_x']) - 180) * (Math.PI / 180);
+        console.log(parseInt(jsonData[pp]['right_knee_x']) * (Math.PI / 180))
         // Left Leg
         model[i].leftUpperLegGroup.rotation.x = gcontrol.leftUpperLegX;
         model[i].leftUpperLegGroup.rotation.y = gcontrol.leftUpperLegY;

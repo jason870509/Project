@@ -787,44 +787,96 @@ var step9 = {
     headY: 0.01,
     headZ: 0.001
 }
+setTimeout(10)
+var pose = [];
+var dance5Keys = [];
+var p;
+for (p = 0; p < 137; p++) {
+    pose[p] = {
+        bodyX: 0.01,
+        bodyY: 128,
+        bodyZ: 0.01,
+        bodyRX: 0.001,
+        bodyRY: 0.01,
+        bodyRZ: 0.01,
+        upperBodyX: 0.1,
+        upperBodyY: 0.01,
+        upperBodyZ: 0.01,
+        lowerBodyX: 0.01,
+        lowerBodyY: 0.01,
+        lowerBodyZ: 0.01,
+        rightUpperArmX: -parseInt(jsonData[p]['right_shoulder_x']) * (Math.PI / 180),
+        rightUpperArmY: 0.01,
+        rightUpperArmZ: 0,
+        rightLowerArmX: -parseInt(jsonData[p]['right_elbow_x']) * (Math.PI / 180),
+        leftUpperArmX: -parseInt(jsonData[p]['left_shoulder_x']) * (Math.PI / 180),
+        leftUpperArmY: 0.01,
+        leftUpperArmZ: 0.01,
+        leftLowerArmX: -parseInt(jsonData[p]['left_elbow_x']) * (Math.PI / 180),
+        rightUpperLegX: -(parseInt(jsonData[p]['right_hip_x']) - 180) * (Math.PI / 180),
+        rightUpperLegY: 0.01,
+        rightUpperLegZ: 0.01,
+        rightLowerLegX: -(parseInt(jsonData[p]['right_knee_x']) - 180) * (Math.PI / 180),
+        leftUpperLegX: -(parseInt(jsonData[p]['left_hip_x']) - 180) * (Math.PI / 180),
+        leftUpperLegY: 0.01,
+        leftUpperLegZ: 0.01,
+        leftLowerLegX: -(parseInt(jsonData[p]['left_knee_x']) - 180) * (Math.PI / 180),
+        rightFeetX: 0.01,
+        rightFeetZ: 0.01,
+        leftFeetX: 0.01,
+        leftFeetZ: 0.01,
+        rightHandX: 0.01,
+        rightHandZ: 0.01,
+        leftHandX: 0.01,
+        leftHandZ: 0.01,
+        headX: 0.001,
+        headY: 0.01,
+        headZ: 0.001
+    }
+    dance5Keys[p] = [p / 136, pose[p]];
+}
 
 
-var dance5T;
 
-console.log(dance5T)
+
+var dance5T = 10;
+
+// console.log(dance5T)
 // bpm = 85 = 1分鐘85拍 = 1拍 60/85(0.705)秒 以一小節四拍算 一小節2.82秒
 // 60 / bpm * 8
 // 8拍 1拍0.25 / 2秒
 
-var dance5Keys = [
-    [0, step1],
-    [0.066 / 2, step1_1],
-    [0.132 / 2, step1_2],
-    [0.2 / 2, step2],
-    [0.25 / 2, step2],
-    [0.35 / 2, step2_1],
-    [0.45 / 2, step3],
-    [0.5 / 2, step3],
-    [0.6 / 2, step3_1],
-    [0.7 / 2, step4],
-    [0.75 / 2, step4],
-    [0.8 / 2, step4_1],
-    [0.95 / 2, step5],
-    [1 / 2, step5],
-    [1.1 / 2, step5_1],
-    [1.2 / 2, step6],
-    [1.25 / 2, step6],
-    [1.3 / 2, step6_1],
-    [1.45 / 2, step7],
-    [1.5 / 2, step7],
-    [1.6 / 2, step7_1],
-    [1.7 / 2, step8],
-    [1.75 / 2, step8],
-    [1.8 / 2, step8_1],
-    [1.95 / 2, step9],
-    [2 / 2, step9]
-];
 
+
+// var dance5Keys = [
+//     [0, step1],
+//     [0.066 / 2, step1_1],
+//     [0.132 / 2, step1_2],
+//     [0.2 / 2, step2],
+//     [0.25 / 2, step2],
+//     [0.35 / 2, step2_1],
+//     [0.45 / 2, step3],
+//     [0.5 / 2, step3],
+//     [0.6 / 2, step3_1],
+//     [0.7 / 2, step4],
+//     [0.75 / 2, step4],
+//     [0.8 / 2, step4_1],
+//     [0.95 / 2, step5],
+//     [1 / 2, step5],
+//     [1.1 / 2, step5_1],
+//     [1.2 / 2, step6],
+//     [1.25 / 2, step6],
+//     [1.3 / 2, step6_1],
+//     [1.45 / 2, step7],
+//     [1.5 / 2, step7],
+//     [1.6 / 2, step7_1],
+//     [1.7 / 2, step8],
+//     [1.75 / 2, step8],
+//     [1.8 / 2, step8_1],
+//     [1.95 / 2, step9],
+//     [2 / 2, step9]
+// ];
+console.log("dance5Keys:", dance5Keys)
 function loadJSON() {
     return {
         "remembered": {
