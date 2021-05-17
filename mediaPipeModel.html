@@ -24,15 +24,9 @@
     <div id="info">Dancing Man<br>
         <button id="play" style="width:10%">Dance</button><br>
         <select name="dance" id="dance">
-            <option value="dance5">Please select dance</option>
-            <option value="walk">walk</option>
-            <option value="walk2">walk-2</option>
-            <option value="jump">jump</option>
-            <option value="dance1">dance-1</option>
-            <option value="dance3">dance-2</option>
-            <option value="dance4">dance-3</option>
-            <option value="dance5">dance-4</option>
-            <option value="dance6">dance-4</option>
+            <option value="dance.json">Please select dance</option>
+            <option value="dance.json">dance-1</option>
+            <option value="dance2.json">dance-2</option>
         </select>
     </div>
     <script src="./json/getJson.js"></script>
@@ -43,25 +37,26 @@
     <script src="./js/jquery-2.1.4.min.js"></script>
     <script src="./json/dance.json"></script>
 
-    </audio>
-
     <script src="buildModel.js"></script>
-    <script src="save_angle.js"></script>
-    <script src="./dance/walk.js"></script>
-    <script src="./dance/jump.js"></script>
-    <!-- <script src="./dance/dance-1.js"></script>
-    <script src="./dance/dance-3.js"></script>
-    <script src="./dance/dance-4.js"></script>
-    <script src="./dance/walk2.js"></script>
-
-    <script src="./dance/dance-6.js"></script>
-    <script src="./dance/dance-5.js"></script> -->
     <script src="./Walking Simulator/js/ccdbox.js"></script>
+    <script src="./Walking Simulator/ik.js"></script>
     <script>
 
         var joint = [];
         var jointP = new THREE.Vector3();
         var jsIndex = 0;
+        var url = 'https://jason870509.github.io/Project/json/'
+        var preURL = '';
+        var change = false;
+
+
+        // 測試用
+        var mouse = new THREE.Vector2();
+        var target = [];
+        var pickPlane, raycaster;
+        var theta1 = 0, theta2 = 0;
+        var ball;
+        var zero = new THREE.Object3D();
         init();
         animate();
 
@@ -92,48 +87,155 @@
             //////////////////////////////////////////////////////////////////////////////
             var floor = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshPhongMaterial({ color: 0x888888, side: THREE.DoubleSide }));
             floor.rotation.x = Math.PI / 2;
-            scene.add(floor);
+            // scene.add(floor);
 
             var plane = new THREE.Mesh(new THREE.PlaneGeometry(640, 480), new THREE.MeshPhongMaterial({ color: 0x888888, side: THREE.DoubleSide }))
             plane.position.y = 240
-            // scene.add(plane);
 
-            // for (i = 0; i < 33; i++) {
-            //     joint[i] = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshPhongMaterial({ color: 0xff00ff }))
-            //     joint[i].position.copy();
-            //     scene.add(joint[i]);
-            // }
-            setTimeout(1000)
-            console.log('x' + (1 + 1))
+
+            var body = new THREE.Object3D();
+
             for (i = 0; i < 33; i++) {
-                x = parseFloat(jsonData[0]['x' + (i + 1)]) * 640 - 640 / 2;
-                y = 480 - parseFloat(jsonData[0]['y' + (i + 1)]) * 480;
-                z = parseFloat(jsonData[0]['z' + (i + 1)]) * 50;
-                jointP = new THREE.Vector3(x, y, z);
-                joint[i] = new THREE.Mesh(new THREE.SphereGeometry(8), new THREE.MeshPhongMaterial({ color: 0xff00ff }))
+                x = parseFloat(jsonData[0]['x' + (i + 1)]) * 1000 - 1000 / 2;
+                y = 800 - parseFloat(jsonData[0]['y' + (i + 1)]) * 800 - 150;
+                z = parseFloat(jsonData[0]['z' + (i + 1)]) * 200;
+                jointP = new THREE.Vector3(x, y, 0);
+                joint[i] = makeJoint(i);
+                if (i == 11 || i == 13 || i == 15) console.log(jointP)
                 joint[i].position.copy(jointP);
-                scene.add(joint[i]);
+                if (i <= 10)
+                    body.attach(joint[i]);
             }
+            // console.log(joint[12].position, joint[16].position)
+            // dis = Math.pow(joint[16].position.x - joint[14].position.x, 2) + Math.pow(joint[16].position.y - joint[14].position.y, 2)
+            // console.log(dis)
+            // console.log(Math.sqrt(dis))
+            // body.position.y = -150;
+            // body.rotation.y = Math.PI;
+            // console.log(joint[11].position, joint[13].position)
+            var bodyJoint = [11, 12/*, 23, 24*/];
+            for (i = 0; i < bodyJoint.length; i++) {
+                body.attach(joint[bodyJoint[i]])
+            }
+            joint[11].attach(joint[13]);
+            joint[13].attach(joint[15]);
+            joint[12].attach(joint[14]);
+            joint[14].attach(joint[16]);
+            joint[24].attach(joint[26]);
+            joint[26].attach(joint[28]);
+            joint[23].attach(joint[25]);
+            joint[25].attach(joint[27]);
 
+            // joint[11].worldToLocal(joint[13].position)
+            // console.log(joint[13].position)
 
+            // joint[13].worldToLocal(joint[15].position)
+            // joint[15].position.set(joint[11].worldToLocal(joint[13].position))
+            // joint[12].position.y = 0
+            scene.add(body)
+
+            var mesh2 = new THREE.Mesh(new THREE.BoxGeometry(40, 5, 5), new THREE.MeshBasicMaterial())
+            scene.add(mesh2)
+            mesh2.position.set(-100, 280, 10)
+
+            preURL = requestURL;
+            ball = new THREE.Mesh(new THREE.SphereGeometry(15), new THREE.MeshPhongMaterial({ color: 0xff0000 }))
+            // ball.position.copy(jointP);
+            scene.add(ball);
+
+            // Pick Plane
+            pickPlane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshBasicMaterial({ color: 0xaaaaaa }));
+            pickPlane.position.z = -1;
+            scene.add(pickPlane);
+            pickPlane.material.visible = true;
+
+            raycaster = new THREE.Raycaster();
+            /////////////////////////////////////////////////////////////////////////
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('mousemove', onDocumentMouseMove, false);
+
+            setarm();
+
+            for (i = 0; i < 2; i++)
+                target[i] = new THREE.Vector3();
         }
 
-
-
+        function makeJoint(i) {
+            var jointObject = new THREE.Object3D();
+            if (i == 12) var mesh = new THREE.Mesh(new THREE.SphereGeometry(15), new THREE.MeshPhongMaterial({ color: 0xff0000 }))
+            else var mesh = new THREE.Mesh(new THREE.SphereGeometry(15), new THREE.MeshPhongMaterial({ color: 0xff00ff }))
+            jointObject.add(mesh);
+            return jointObject;
+        }
 
         function animate() {
-            jsIndex += 1;
-            if (jsIndex > 135)
-                jsIndex = 0;
-            console.log(jsIndex)
-            for (i = 0; i < 33; i++) {
-                x = parseFloat(jsonData[jsIndex]['x' + (i + 1)]) * 640 - 640 / 2;
-                y = 480 - parseFloat(jsonData[jsIndex]['y' + (i + 1)]) * 480;
-                z = parseFloat(jsonData[0]['z' + (i + 1)]) * 100;
-                jointP = new THREE.Vector3(x, y, z);
-                joint[i].position.copy(jointP);
+            var jsIndexMax;
+
+            if (requestURL = url + 'dance.json') jsIndexMax = 135;//135
+            else if (requestURL = url + 'dance2.json') jsIndexMax = 511;
+
+            requestURL = url + document.getElementById("dance").value;
+            if (preURL != requestURL) {
+                preURL = requestURL;
+                change = true;
             }
 
+            if (change) {
+                // console.log('change')
+                request.open('GET', requestURL);
+                request.responseType = 'json';
+                request.send();
+                request.onload = function () {
+                    jsonData = request.response;
+                }
+                change = false;
+            }
+
+            jsIndex += 1;
+            if (jsIndex >= jsIndexMax)
+                jsIndex = 0;
+
+            for (i = 0; i < 33; i++) {
+                x = parseFloat(jsonData[jsIndex]['x' + (i + 1)]) * 1000 - 1000 / 2;
+                y = 800 - parseFloat(jsonData[jsIndex]['y' + (i + 1)]) * 800 - 150;
+                z = parseFloat(jsonData[0]['z' + (i + 1)]) * 200;
+                jointP = new THREE.Vector3(x, y, 0);
+                if (i == 13) joint[11].worldToLocal(jointP);
+                if (i == 15) {
+                    target[1].copy(jointP);
+                    joint[13].worldToLocal(jointP);
+                }
+                if (i == 14) joint[12].worldToLocal(jointP);
+                if (i == 16) {
+                    target[0].copy(jointP);
+                    joint[14].worldToLocal(jointP);
+                }
+                if (i == 25) joint[23].worldToLocal(jointP);
+                if (i == 27) joint[25].worldToLocal(jointP);
+                if (i == 26) joint[24].worldToLocal(jointP);
+                if (i == 28) joint[26].worldToLocal(jointP);
+
+
+                // joint[i].position.copy(jointP);
+
+            }
+            target[0].y -= 270;
+            target[1].y -= 251;
+
+            var theta = [theta1, theta2];
+
+            ik_ccd(target[0], theta, 0);
+            ball.position.copy(target[0])
+            theta1 = theta[0], theta2 = theta[1];
+            joint[12].rotation.z = theta[0]
+            joint[14].rotation.z = theta[1]
+
+
+            ik_ccd(target[1], theta, 0);
+            ball.position.copy(target[1])
+            theta1 = theta[0], theta2 = theta[1];
+            joint[11].rotation.z = theta[0] + Math.PI
+            joint[13].rotation.z = theta[1]
 
             requestAnimationFrame(animate);
             renderer.render(scene, camera);

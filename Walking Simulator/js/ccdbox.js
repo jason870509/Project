@@ -41,17 +41,21 @@ function CLAMP(x, xlo, xhi) {
     return x;
 }
 
-function ik_ccd(target, theta) {
+function ik_ccd(target, theta, i) {
     var end = new THREE.Vector3();
     var base = new THREE.Vector3();
-
+    // console.log("i", i)
     // e.g., njoints = 2;
     // jointid: 0,0,1
     var njoints = axes[axes.length - 1].jointid + 1;
     var joints = [];
     for (var i = 0; i <= njoints; i++) joints[i] = new THREE.Vector3();
 
-    fk(theta, joints);
+    if (i == 0)
+        fk(theta, joints);
+    else if (i == 1)
+        fk1(theta, joints);
+
     end.copy(joints[joints.length - 1]);
 
     // convergence

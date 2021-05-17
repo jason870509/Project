@@ -167,14 +167,6 @@
       floor.rotation.x = -Math.PI / 2
       scene.add(floor)
 
-      // Pick Plane
-      pickPlane = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshBasicMaterial());
-      // pickPlane.rotation.x = -Math.PI / 2;
-      // scene.add(pickPlane);
-      pickPlane.material.visible = true;
-
-      raycaster = new THREE.Raycaster();
-
       ///////////////////////////////////////////////////////////
       //set body
       // bodyLink = new TwoLinkLeg();
@@ -236,7 +228,15 @@
         joints[i] = new THREE.Vector3();
       setarm();
 
+
+
+      // Pick Plane
+      pickPlane = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshBasicMaterial());
+      // pickPlane.rotation.x = -Math.PI / 2;
+      // scene.add(pickPlane);
+      pickPlane.material.visible = true;
       /////////////////////////////////////////////////////////
+      raycaster = new THREE.Raycaster();
       window.addEventListener('resize', onWindowResize, false);
       window.addEventListener('mousemove', onDocumentMouseMove, false);
     }
