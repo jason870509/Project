@@ -1,6 +1,6 @@
 const header = document.querySelector('header');
 const section = document.querySelector('section');
-var requestURL = 'https://jason870509.github.io/Project/json/dance.json';
+var requestURL = 'https://jason870509.github.io/Project/json/dance3.json';
 var request = new XMLHttpRequest();
 var jsonData;
 request.open('GET', requestURL);

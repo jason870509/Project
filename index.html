@@ -82,7 +82,7 @@
     var change = 0;
     var dacne = 1;
     var changePosition = false;
-    var changeMusic = true, changeT = true;
+    var changeT = true;
     var premusic = document.getElementById("dance").value;
 
     var soundTrack, soundTrack2;
@@ -416,9 +416,6 @@
     function init() {
       soundTrack = document.getElementById('soundtrack');
       soundTrack.pause();
-      // soundTrack2 = document.getElementById('soundtrack2');
-      // soundTrack2.pause();
-
 
       scene = new THREE.Scene();
 
@@ -457,12 +454,14 @@
       var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
       //scene.add(gridXZ);
       gridXZ.position.y = -50
+
       //////////////////////////////////////////////////////////////////////////////
       var floor = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshPhongMaterial({ color: 0x888888, side: THREE.DoubleSide }));
       floor.rotation.x = Math.PI / 2;
       floor.receiveShadow = true;
       scene.add(floor);
 
+      // 跳舞時的 model
       for (i = 0; i < 3; i++) {
         model[i] = new DanceModel();
         body = model[i].init();
@@ -474,7 +473,7 @@
       model[1].body.position.set(150, 128, 0);
       model[2].body.position.set(0, 128, 0);
 
-
+      // 移動時的 model
       for (i = 0; i < 6; i += 2) {
         moveModel[i] = new MoveModel();
         body = moveModel[i].init();
@@ -640,14 +639,14 @@
       var keys = eval(document.getElementById("dance").value + "Keys");
       var T = eval(document.getElementById("dance").value + "T");
       var music = document.getElementById("music").value;
+
+      // 切換音樂
       if (premusic != music) {
         document.getElementById('soundtrack').src = document.getElementById("music").value;
-        changeMusic = true;
         premusic = music;
-        console.log(premusic)
       }
 
-
+      // 依據不同bpm設定T
       bpm1 = "";
       for (i = 0; i < document.getElementById('soundtrack').src.length; i++) {
         if (document.getElementById('soundtrack').src[i] == '-')
@@ -657,7 +656,7 @@
             bpm1 = bpm1.concat(document.getElementById('soundtrack').src[j])
           }
       }
-      console.log(bpm1);
+
       if (type == 0) {
         keys = walk2Keys;
         T = walk2T;
@@ -682,14 +681,8 @@
       else {
         T = 60 / parseInt(bpm1, 10) * 8;
       }
-      // if (changeMusic || changeT) {
 
-
-      // }
-
-      // console.log(T)
       var s = ((t - ts) % T) / T;
-
       for (var i = 1; i < keys.length; i++) {
         if (keys[i][0] > s) { break; }
       }
@@ -697,7 +690,6 @@
       var ii = i - 1;
       var a = (s - keys[ii][0]) / (keys[ii + 1][0] - keys[ii][0]);
       var forwordKey = 'keys[ii][1].', backwardKey = 'keys[ii + 1][1].';
-      //console.log(danceClock.getElapsedTime(), moveClock.getElapsedTime())
       for (j = 0; j < guiNameString.length; j++) {
         intKey[j] = eval(forwordKey + guiNameString[j]) * (1 - a) + eval(backwardKey + guiNameString[j]) * a;
       }
@@ -709,6 +701,7 @@
       model[i].body.visible = true;
 
       keyframe(type, danceClock.getElapsedTime());
+
       var translationX = 0, translationZ = 0;
       if (i == 1) {
         translationX = 150;
@@ -723,8 +716,6 @@
       model[i].body.position.x = intKey[0] + moveModel[i * 2].torsoTarget.x;
       model[i].body.position.y = intKey[1];
       model[i].body.position.z = intKey[2] + moveModel[i * 2].torsoTarget.z;
-
-
       // Body rotation
       model[i].body.eulerOrder = 'XYZ';
       model[i].body.rotation.x = intKey[3];
@@ -779,12 +770,8 @@
         soundVal += sign * 0.01;
         soundVal = THREE.Math.clamp(soundVal, 0, 1);
         soundtrack.volume = soundVal;
-        // soundtrack2.volume = soundVal;
-        for (i = 0; i < model.length; i++) {
-          // if (i == model.length - 1)
-          //   keyframeMove(1, i);
-          // else
 
+        for (i = 0; i < model.length; i++) {
           if (changePosition && i == model.length - 1) {
             keyframeMove(4, i);
 
@@ -865,11 +852,8 @@
           for (i = 0; i < moveModel.length; i += 2) {
             moveModel[i].reset();
           }
-          // console.log(gcontrol.leftModelTheta)
 
           first = 0;
-          // document.getElementById('soundtrack').src = "sounds/rap_beat-85.mp3";
-          // console.log(document.getElementById('soundtrack').src);
           soundTrack.pause();
         }
         else {
@@ -890,7 +874,6 @@
     function update() {
       var Ts = 0.5; // 週期
       var time = moveClock.getElapsedTime(); // 過去時間，配合clock.start()
-      // console.log
 
       var V = Ls / Ts; // Ls為一步長度
       var n = Math.floor(moveModel[0].dt / Ts);
@@ -942,13 +925,6 @@
       }
 
       moveClock.start();
-
-      // var theta = [theta1, theta2];
-      // ik_ccd(target, theta);
-      // link1.rotation.z = theta[0]
-      // link2.rotation.z = theta[1]
-      // bodyLink.upperLegGroup.rotation.z = theta[0]
-      // bodyLink.lowerLegGroup.rotation.z = theta[1]
     }
 
   </script>
